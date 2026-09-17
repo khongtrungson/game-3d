@@ -1,0 +1,19 @@
+{
+    "name": "NullProtocol.AI",
+    "rootNamespace": "NullProtocol.AI",
+    "references": [
+        "NullProtocol.Core",
+        "NullProtocol.Combat",
+        "NullProtocol.Gadgets",
+        "Unity.AI.Navigation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
