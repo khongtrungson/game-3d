@@ -1,0 +1,19 @@
+{
+    "name": "NullProtocol.Gadgets",
+    "rootNamespace": "NullProtocol.Gadgets",
+    "references": [
+        "NullProtocol.Core",
+        "NullProtocol.Combat",
+        "Unity.InputSystem",
+        "Unity.AI.Navigation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

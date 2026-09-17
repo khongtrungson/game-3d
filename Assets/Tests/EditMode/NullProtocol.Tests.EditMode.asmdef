@@ -5,7 +5,9 @@
         "NullProtocol.Core",
         "NullProtocol.Controller",
         "NullProtocol.Combat",
+        "NullProtocol.Gadgets",
         "Unity.InputSystem",
+        "Unity.AI.Navigation",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
