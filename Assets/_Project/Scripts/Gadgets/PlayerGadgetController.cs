@@ -100,8 +100,8 @@ namespace NullProtocol.Gadgets
                 TryDeployBarricade();
             }
 
-            // FR-18: Key 2 or F -> Null-Cloud Smoke
-            if (keyboard[Key.Digit2].wasPressedThisFrame || keyboard[Key.F].wasPressedThisFrame)
+            // FR-18: Key 2 or F -> Null-Cloud Smoke (F only if not interacting with Data Core terminal)
+            if (keyboard[Key.Digit2].wasPressedThisFrame || (keyboard[Key.F].wasPressedThisFrame && !InteractionState.IsTerminalActive()))
             {
                 TryDeploySmoke();
             }

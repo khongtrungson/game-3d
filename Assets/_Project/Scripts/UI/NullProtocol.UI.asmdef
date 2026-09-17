@@ -1,0 +1,23 @@
+{
+    "name": "NullProtocol.UI",
+    "rootNamespace": "NullProtocol.UI",
+    "references": [
+        "NullProtocol.Core",
+        "NullProtocol.Controller",
+        "NullProtocol.Combat",
+        "NullProtocol.Gadgets",
+        "NullProtocol.World",
+        "Unity.InputSystem",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

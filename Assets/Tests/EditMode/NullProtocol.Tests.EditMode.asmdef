@@ -7,6 +7,8 @@
         "NullProtocol.Combat",
         "NullProtocol.Gadgets",
         "NullProtocol.AI",
+        "NullProtocol.World",
+        "NullProtocol.UI",
         "Unity.InputSystem",
         "Unity.AI.Navigation",
         "UnityEngine.TestRunner",

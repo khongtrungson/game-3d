@@ -44,6 +44,7 @@ namespace NullProtocol.Controller
 
             NullLog.Info("Health", $"Player took {effectiveDamage} damage. Current HP: {_currentHealth}");
             _playerStateEvents?.RaiseHealthChanged(_currentHealth, _maxHealth);
+            _playerStateEvents?.RaisePlayerDamageTaken(effectiveDamage, hitPoint);
 
             if (_currentHealth <= 0)
             {

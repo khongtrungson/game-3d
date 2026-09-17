@@ -1,0 +1,22 @@
+{
+    "name": "NullProtocol.World",
+    "rootNamespace": "NullProtocol.World",
+    "references": [
+        "NullProtocol.Core",
+        "NullProtocol.Controller",
+        "NullProtocol.Combat",
+        "NullProtocol.Gadgets",
+        "NullProtocol.AI",
+        "Unity.InputSystem",
+        "Unity.AI.Navigation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
