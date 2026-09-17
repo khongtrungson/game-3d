@@ -104,6 +104,14 @@ namespace NullProtocol.Combat
             _isFrozen = false;
 
             NullLog.Info("Sentinel", $"Sentinel neutralized! Headshot: {isHeadshot}, Disintegrated: {_isDisintegrated}");
+            
+            // FR-38: Freeze for 0.15s then shatter into 30-50 wireframe voxels dissolving over 2.0s
+            var voxelShatter = GetComponent<SentinelVoxelShatterDeath>();
+            if (voxelShatter != null)
+            {
+                voxelShatter.TriggerShatterDeath(hitPoint, Vector3.up);
+            }
+
             _killChannel?.RaiseKill(this, isHeadshot, hitPoint);
         }
 

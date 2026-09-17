@@ -24,6 +24,12 @@ namespace NullProtocol.Controller
         [Header("Event Channel")]
         [SerializeField] private AcousticStimulusEventChannelSO _acousticEvents;
 
+        [Header("3D HRTF Spatial Audio (FR-39)")]
+        [SerializeField] private AudioSource _audioSource;
+        [SerializeField] private AudioClip _crouchFootstepClip;
+        [SerializeField] private AudioClip _walkFootstepClip;
+        [SerializeField] private AudioClip _sprintFootstepClip;
+
         [Header("Debug")]
         [SerializeField] private bool _drawDebugGizmos = true;
 
@@ -35,6 +41,24 @@ namespace NullProtocol.Controller
         public float CrouchRadius => _crouchRadius;
         public float WalkRadius => _walkRadius;
         public float SprintRadius => _sprintRadius;
+
+        private void Awake()
+        {
+            if (_audioSource == null)
+            {
+                _audioSource = GetComponent<AudioSource>();
+            }
+
+            if (_audioSource != null)
+            {
+                _audioSource.spatialBlend = 1.0f;
+                _audioSource.spatialize = true;
+                _audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+                _audioSource.minDistance = 1.0f;
+                _audioSource.maxDistance = 20.0f;
+                _audioSource.playOnAwake = false;
+            }
+        }
 
         private void Start()
         {
@@ -67,20 +91,31 @@ namespace NullProtocol.Controller
         {
             float radius = _walkRadius;
             AcousticStimulusType type = AcousticStimulusType.WalkFootstep;
+            AudioClip clipToPlay = _walkFootstepClip;
 
             if (isCrouching)
             {
                 radius = _crouchRadius;
                 type = AcousticStimulusType.CrouchFootstep;
+                clipToPlay = _crouchFootstepClip != null ? _crouchFootstepClip : _walkFootstepClip;
             }
             else if (isSprinting)
             {
                 radius = _sprintRadius;
                 type = AcousticStimulusType.SprintFootstep;
+                clipToPlay = _sprintFootstepClip != null ? _sprintFootstepClip : _walkFootstepClip;
             }
 
             _lastEmittedRadius = radius;
             _lastEmitTime = Time.time;
+
+            // Play 3D HRTF footstep audio (FR-39)
+            if (clipToPlay != null && _audioSource != null)
+            {
+                _audioSource.pitch = Random.Range(0.95f, 1.05f);
+                float volume = isCrouching ? 0.4f : (isSprinting ? 1.0f : 0.7f);
+                _audioSource.PlayOneShot(clipToPlay, volume);
+            }
 
             _acousticEvents?.RaiseStimulus(position, radius, type);
             NullLog.Info("Acoustics", $"Footstep emitted at {position}, radius: {radius}m, type: {type}");

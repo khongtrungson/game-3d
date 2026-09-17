@@ -20,6 +20,24 @@ namespace NullProtocol.Combat
         [Header("De-Rez Ripple / Decal")]
         [SerializeField] private GameObject _deRezRipplePrefab;
 
+        [Header("3D HRTF Binaural Audio (FR-39)")]
+        [SerializeField] private AudioClip _gunshotClip;
+        [SerializeField] private AudioClip _ricochetClip;
+        [SerializeField] private AudioSource _audioSource;
+
+        private void Awake()
+        {
+            if (_audioSource == null)
+            {
+                _audioSource = GetComponent<AudioSource>();
+            }
+
+            if (_audioSource != null)
+            {
+                BinauralAudioSpatializer.ConfigureBinauralSource(_audioSource, 2.0f, 35.0f);
+            }
+        }
+
         public void PlayFireEffects(Vector3 muzzlePosition, Vector3 targetPosition)
         {
             // Procedural muzzle flash
@@ -32,6 +50,20 @@ namespace NullProtocol.Combat
             if (_muzzleLight != null)
             {
                 StartCoroutine(MuzzleLightFlash());
+            }
+
+            // FR-39: Play 3D spatialized gunshot
+            if (_gunshotClip != null)
+            {
+                if (_audioSource != null)
+                {
+                    _audioSource.pitch = Random.Range(0.96f, 1.04f);
+                    _audioSource.PlayOneShot(_gunshotClip);
+                }
+                else
+                {
+                    BinauralAudioSpatializer.PlayClipAtPointBinaural(_gunshotClip, muzzlePosition, 1.0f, Random.Range(0.96f, 1.04f));
+                }
             }
 
             // Procedural tracer line
@@ -52,6 +84,12 @@ namespace NullProtocol.Combat
             {
                 var ripple = Instantiate(_deRezRipplePrefab, hitPoint, Quaternion.LookRotation(hitNormal));
                 Destroy(ripple, 2.0f);
+            }
+
+            // FR-39: Play 3D binaural ricochet audio
+            if (_ricochetClip != null)
+            {
+                BinauralAudioSpatializer.PlayClipAtPointBinaural(_ricochetClip, hitPoint, 0.8f, Random.Range(0.9f, 1.15f), 1.0f, 20.0f);
             }
         }
 
