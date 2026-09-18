@@ -66,8 +66,30 @@ namespace NullProtocol.Controller
 
         private void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            SetCursorLocked(true);
+        }
+
+        private void Update()
+        {
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard != null && keyboard[UnityEngine.InputSystem.Key.Escape].wasPressedThisFrame)
+            {
+                // Toggle cursor lock state on Escape
+                SetCursorLocked(Cursor.lockState == CursorLockMode.Locked ? false : true);
+            }
+
+            // Click back into game window to lock cursor again
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            if (mouse != null && mouse.leftButton.wasPressedThisFrame && Cursor.lockState != CursorLockMode.Locked)
+            {
+                SetCursorLocked(true);
+            }
+        }
+
+        public void SetCursorLocked(bool locked)
+        {
+            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !locked;
         }
 
         public void ApplySettings(GameSettingsData settings)
@@ -81,6 +103,8 @@ namespace NullProtocol.Controller
 
         public void ProcessLook(Vector2 lookDelta)
         {
+            if (Cursor.lockState != CursorLockMode.Locked) return;
+
             Vector2 processedDelta = lookDelta;
 
             // Apply mouse acceleration if enabled (default OFF per FR-45)

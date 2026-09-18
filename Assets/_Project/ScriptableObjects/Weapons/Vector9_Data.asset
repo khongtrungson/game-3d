@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bece2fed973e05f948381836ee184168, type: 3}
+  m_Name: Vector9_Data
+  m_EditorClassIdentifier: NullProtocol.Combat::NullProtocol.Combat.WeaponDataSO
+  WeaponId: 0
+  WeaponName: Vector-9
+  BodyDamage: 30
+  HeadDamage: 75
+  DisintegratesOnHeadshot: 0
+  MagazineCapacity: 12
+  InitialSpareAmmo: 36
+  ReloadTime: 1.2
+  RoundsPerMinute: 400
+  DefaultFireMode: 0
+  AllowsBurst: 0
+  BurstCount: 3
+  BurstRoundsPerMinute: 550
+  ChargeTime: 0.6
+  IsSilenced: 1
+  AcousticNoiseRadius: 25
+  RecoilPitchAngle: 0.8
+  RecoilYawSpread: 0.2
+  PenetratesBarricades: 0
+  PenetratesOneWall: 0
+  MaxPenetrationThickness: 0.6
+  AdsFovMultiplier: 0.85
+  AdsSwayDampening: 0.2
