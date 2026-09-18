@@ -1,4 +1,5 @@
 using UnityEngine;
+using NullProtocol.Core;
 
 namespace NullProtocol.UI
 {
@@ -37,6 +38,15 @@ namespace NullProtocol.UI
         [Header("Low Ammo Thresholds")]
         [SerializeField] private float _lowAmmoPercentage = 0.33f;
         [SerializeField] private int _criticalAmmoCount = 1;
+
+        public void ApplyWireframeTheme(WireframeTheme theme)
+        {
+            var palette = WireframeThemePalette.GetPalette(theme);
+            _normalEmissiveColor = palette.PrimaryColor * 2.5f;
+            _lowAmmoEmissiveColor = palette.SecondaryColor * 3.0f;
+            _criticalAmmoEmissiveColor = palette.CriticalColor * 3.5f;
+            UpdateDisplay();
+        }
 
         // Cached Property IDs
         private int _ammoPropId;

@@ -177,6 +177,9 @@ namespace NullProtocol.Persistence
         // Lifetime Metrics (FR-40)
         public LifetimeMetrics Metrics = new LifetimeMetrics();
 
+        // Settings, Controls & Accessibility (FR-44, FR-45, FR-46)
+        public GameSettingsData Settings = new GameSettingsData();
+
         public ProfileData()
         {
             EnsureSubsectorRecords();
@@ -184,6 +187,11 @@ namespace NullProtocol.Persistence
 
         public void EnsureSubsectorRecords()
         {
+            if (Settings == null)
+            {
+                Settings = new GameSettingsData();
+            }
+
             if (SubsectorRecords == null)
             {
                 SubsectorRecords = new List<SubsectorProgressRecord>();

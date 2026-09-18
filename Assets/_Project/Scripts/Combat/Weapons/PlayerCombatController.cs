@@ -76,6 +76,24 @@ namespace NullProtocol.Combat
             InitializeInput();
         }
 
+        public InputActionAsset InputActions
+        {
+            get => _inputActions;
+            set
+            {
+                if (_inputActions != value)
+                {
+                    DisableInputCallbacks();
+                    _inputActions = value;
+                    InitializeInput();
+                    if (isActiveAndEnabled)
+                    {
+                        EnableInputCallbacks();
+                    }
+                }
+            }
+        }
+
         private void InitializeInput()
         {
             if (_inputActions == null) return;
@@ -92,6 +110,16 @@ namespace NullProtocol.Combat
         }
 
         private void OnEnable()
+        {
+            EnableInputCallbacks();
+        }
+
+        private void OnDisable()
+        {
+            DisableInputCallbacks();
+        }
+
+        private void EnableInputCallbacks()
         {
             if (_attackAction != null)
             {
@@ -115,20 +143,20 @@ namespace NullProtocol.Combat
 
             if (_previousWeaponAction != null)
             {
-                _previousWeaponAction.performed += ctx => SwitchWeaponRelative(-1);
+                _previousWeaponAction.performed += OnPreviousWeaponPerformed;
                 _previousWeaponAction.Enable();
             }
 
             if (_nextWeaponAction != null)
             {
-                _nextWeaponAction.performed += ctx => SwitchWeaponRelative(1);
+                _nextWeaponAction.performed += OnNextWeaponPerformed;
                 _nextWeaponAction.Enable();
             }
 
             _lookAction?.Enable();
         }
 
-        private void OnDisable()
+        private void DisableInputCallbacks()
         {
             if (_attackAction != null)
             {
@@ -150,9 +178,29 @@ namespace NullProtocol.Combat
                 _adsAction.Disable();
             }
 
-            _previousWeaponAction?.Disable();
-            _nextWeaponAction?.Disable();
+            if (_previousWeaponAction != null)
+            {
+                _previousWeaponAction.performed -= OnPreviousWeaponPerformed;
+                _previousWeaponAction.Disable();
+            }
+
+            if (_nextWeaponAction != null)
+            {
+                _nextWeaponAction.performed -= OnNextWeaponPerformed;
+                _nextWeaponAction.Disable();
+            }
+
             _lookAction?.Disable();
+        }
+
+        private void OnPreviousWeaponPerformed(InputAction.CallbackContext ctx)
+        {
+            SwitchWeaponRelative(-1);
+        }
+
+        private void OnNextWeaponPerformed(InputAction.CallbackContext ctx)
+        {
+            SwitchWeaponRelative(1);
         }
 
         private void Update()

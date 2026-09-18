@@ -35,8 +35,26 @@ namespace NullProtocol.Combat
 
         public bool IsAiming => _isAiming;
         public float CurrentFov => _currentFov;
+        public float BaseFov
+        {
+            get => _baseFov;
+            set => SetBaseFov(value);
+        }
         public float AdsSwayMultiplier => _adsSwayMultiplier;
         public float AdsFovMultiplier => _adsFovMultiplier;
+
+        public void SetBaseFov(float fov)
+        {
+            _baseFov = Mathf.Clamp(fov, 80.0f, 110.0f);
+            if (!_isAiming)
+            {
+                _currentFov = _baseFov;
+                if (_playerCamera != null)
+                {
+                    _playerCamera.fieldOfView = _baseFov;
+                }
+            }
+        }
 
         private void Awake()
         {

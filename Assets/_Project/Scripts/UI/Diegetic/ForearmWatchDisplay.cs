@@ -39,6 +39,15 @@ namespace NullProtocol.UI
         [SerializeField] private float _warningThreshold = 0.5f;
         [SerializeField] private float _criticalThreshold = 0.25f;
 
+        public void ApplyWireframeTheme(WireframeTheme theme)
+        {
+            var palette = WireframeThemePalette.GetPalette(theme);
+            _healthyColor = palette.PrimaryColor * 2.0f;
+            _warningColor = palette.SecondaryColor * 2.5f;
+            _criticalColor = palette.CriticalColor * 3.0f;
+            UpdateWatchDisplay();
+        }
+
         [Header("Event Channels")]
         [SerializeField] private PlayerStateEventChannelSO _playerStateEvents;
         [SerializeField] private GadgetEventChannelSO _gadgetEvents;

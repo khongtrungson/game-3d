@@ -84,6 +84,17 @@ namespace NullProtocol.Persistence
             _checkpointManager = new CheckpointManager(_currentProfile, _storageService);
 
             _achievementTracker.OnAchievementUnlocked += HandleAchievementUnlocked;
+
+            // Wire SettingsManager hooks (FR-44, FR-45, FR-46)
+            SettingsManager.ProfileSettingsLoader = () => _currentProfile?.Settings;
+            SettingsManager.ProfileSettingsSaver = settings =>
+            {
+                if (_currentProfile != null)
+                {
+                    _currentProfile.Settings = settings;
+                    SaveProfile();
+                }
+            };
         }
 
         private void OnEnable()

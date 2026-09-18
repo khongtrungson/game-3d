@@ -87,6 +87,7 @@ namespace NullProtocol.Controller
         public bool CanFire => _canFire;
         public bool CanAds => _canAds;
         public float CurrentSpeed => _currentHorizontalVelocity.magnitude;
+        public FirstPersonCameraLook CameraLook => _cameraLook;
         public float RecoilModifier => _isCrouching ? 0.7f : 1.0f; // FR-2: 30% recoil reduction when crouched
 
         private void Awake()
@@ -115,6 +116,24 @@ namespace NullProtocol.Controller
             }
 
             InitializeInput();
+        }
+
+        public InputActionAsset InputActions
+        {
+            get => _inputActions;
+            set
+            {
+                if (_inputActions != value)
+                {
+                    DisableInputCallbacks();
+                    _inputActions = value;
+                    InitializeInput();
+                    if (isActiveAndEnabled)
+                    {
+                        EnableInputCallbacks();
+                    }
+                }
+            }
         }
 
         private void InitializeInput()

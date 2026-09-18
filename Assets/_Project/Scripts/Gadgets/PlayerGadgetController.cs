@@ -47,6 +47,95 @@ namespace NullProtocol.Gadgets
         public int SmokeCharges => _smokeCharges;
         public int TripMineCharges => _tripMineCharges;
 
+        private InputAction _barricadeAction;
+        private InputAction _smokeAction;
+        private InputAction _tripMineAction;
+
+        public InputActionAsset InputActions
+        {
+            get => _inputActions;
+            set
+            {
+                if (_inputActions != value)
+                {
+                    DisableInputActions();
+                    _inputActions = value;
+                    InitializeInputActions();
+                    if (isActiveAndEnabled)
+                    {
+                        EnableInputActions();
+                    }
+                }
+            }
+        }
+
+        private void InitializeInputActions()
+        {
+            if (_inputActions == null) return;
+            var playerMap = _inputActions.FindActionMap("Player");
+            if (playerMap == null) return;
+
+            _barricadeAction = playerMap.FindAction("GadgetBarricade");
+            _smokeAction = playerMap.FindAction("GadgetSmoke");
+            _tripMineAction = playerMap.FindAction("GadgetTripMine");
+        }
+
+        private void EnableInputActions()
+        {
+            if (_barricadeAction != null)
+            {
+                _barricadeAction.performed += OnBarricadeAction;
+                _barricadeAction.Enable();
+            }
+            if (_smokeAction != null)
+            {
+                _smokeAction.performed += OnSmokeAction;
+                _smokeAction.Enable();
+            }
+            if (_tripMineAction != null)
+            {
+                _tripMineAction.performed += OnTripMineAction;
+                _tripMineAction.Enable();
+            }
+        }
+
+        private void DisableInputActions()
+        {
+            if (_barricadeAction != null)
+            {
+                _barricadeAction.performed -= OnBarricadeAction;
+                _barricadeAction.Disable();
+            }
+            if (_smokeAction != null)
+            {
+                _smokeAction.performed -= OnSmokeAction;
+                _smokeAction.Disable();
+            }
+            if (_tripMineAction != null)
+            {
+                _tripMineAction.performed -= OnTripMineAction;
+                _tripMineAction.Disable();
+            }
+        }
+
+        private void OnBarricadeAction(InputAction.CallbackContext ctx)
+        {
+            TryDeployBarricade();
+        }
+
+        private void OnSmokeAction(InputAction.CallbackContext ctx)
+        {
+            if (!InteractionState.IsTerminalActive())
+            {
+                TryDeploySmoke();
+            }
+        }
+
+        private void OnTripMineAction(InputAction.CallbackContext ctx)
+        {
+            TryDeployTripMine();
+        }
+
         private void Awake()
         {
             if (_playerCamera == null)
@@ -66,10 +155,14 @@ namespace NullProtocol.Gadgets
             _barricadeCharges = INITIAL_BARRICADE_CHARGES;
             _smokeCharges = INITIAL_SMOKE_CHARGES;
             _tripMineCharges = INITIAL_TRIP_MINE_CHARGES;
+
+            InitializeInputActions();
         }
 
         private void OnEnable()
         {
+            EnableInputActions();
+
             if (_gadgetChannel != null)
             {
                 _gadgetChannel.OnGadgetRefunded += HandleGadgetRefunded;
@@ -78,6 +171,8 @@ namespace NullProtocol.Gadgets
 
         private void OnDisable()
         {
+            DisableInputActions();
+
             if (_gadgetChannel != null)
             {
                 _gadgetChannel.OnGadgetRefunded -= HandleGadgetRefunded;
@@ -86,7 +181,11 @@ namespace NullProtocol.Gadgets
 
         private void Update()
         {
-            HandleInput();
+            // Fallback direct keyboard input for standalone usage when actions are not bound
+            if (_barricadeAction == null && _smokeAction == null && _tripMineAction == null)
+            {
+                HandleInput();
+            }
         }
 
         private void HandleInput()
