@@ -9,6 +9,7 @@
         "NullProtocol.AI",
         "NullProtocol.World",
         "NullProtocol.UI",
+        "NullProtocol.Persistence",
         "Unity.InputSystem",
         "Unity.AI.Navigation",
         "UnityEngine.TestRunner",

@@ -26,6 +26,7 @@ namespace NullProtocol.World
         private readonly List<IResettable> _roomResettables = new List<IResettable>();
         private bool _isPlayerInside;
         private bool _isCleared;
+        private int _damageTakenInRoom;
 
         public string RoomId => _roomId;
         public string RoomDisplayName => _roomDisplayName;
@@ -33,11 +34,19 @@ namespace NullProtocol.World
         public Bounds RoomBounds => _roomBounds;
         public bool IsPlayerInside => _isPlayerInside;
         public bool IsCleared => _isCleared;
+        public int DamageTakenInRoom => _damageTakenInRoom;
+        public bool IsClearedWithZeroDamage => _isCleared && _damageTakenInRoom == 0;
         public IReadOnlyList<IResettable> Resettables => _roomResettables;
 
         public event Action<RoomController> OnRoomEntered;
         public event Action<RoomController> OnRoomReset;
         public event Action<RoomController> OnRoomCleared;
+
+        public void Initialize(string roomId, string roomDisplayName)
+        {
+            _roomId = roomId;
+            _roomDisplayName = roomDisplayName;
+        }
 
         private void Awake()
         {
@@ -80,8 +89,23 @@ namespace NullProtocol.World
         public void HandlePlayerEnter()
         {
             _isPlayerInside = true;
+            if (!_isCleared)
+            {
+                _damageTakenInRoom = 0;
+            }
             NullLog.Info("Room", $"Player entered room: {_roomDisplayName} ({_roomId})");
             OnRoomEntered?.Invoke(this);
+        }
+
+        /// <summary>
+        /// Records damage taken by the player while inside this room.
+        /// </summary>
+        public void RecordDamageTaken(int amount)
+        {
+            if (_isPlayerInside && amount > 0)
+            {
+                _damageTakenInRoom += amount;
+            }
         }
 
         /// <summary>
@@ -100,7 +124,7 @@ namespace NullProtocol.World
             if (!_isCleared)
             {
                 _isCleared = true;
-                NullLog.Info("Room", $"Room cleared: {_roomDisplayName}");
+                NullLog.Info("Room", $"Room cleared: {_roomDisplayName} (Damage taken in room: {_damageTakenInRoom})");
                 OnRoomCleared?.Invoke(this);
             }
         }
@@ -111,6 +135,7 @@ namespace NullProtocol.World
         public void ResetRoom(TacticalLocomotionController playerLocomotion = null, PlayerHealth playerHealth = null)
         {
             NullLog.Info("Room", $"Executing instantaneous room reset for: {_roomDisplayName}");
+            _damageTakenInRoom = 0;
 
             // 1. Reset all registered volatile room actors (enemies, deployed barricades, mines, etc.)
             for (int i = 0; i < _roomResettables.Count; i++)

@@ -27,20 +27,25 @@ namespace NullProtocol.UI
         public int DamageTaken;
         public TacticalGrade Grade;
         public int EnemiesNeutralized;
+        public int HeadshotsCount;
 
         public string FormattedTime
         {
             get
             {
-                int minutes = Mathf.FloorToInt(ElapsedTimeSeconds / 60f);
-                int seconds = Mathf.FloorToInt(ElapsedTimeSeconds % 60f);
-                int centis = Mathf.FloorToInt((ElapsedTimeSeconds * 100f) % 100f);
+                int totalCentis = Mathf.RoundToInt(ElapsedTimeSeconds * 100f);
+                int centis = totalCentis % 100;
+                int totalSeconds = totalCentis / 100;
+                int minutes = totalSeconds / 60;
+                int seconds = totalSeconds % 60;
                 return $"{minutes:00}:{seconds:00}.{centis:00}";
             }
         }
 
         public string FormattedAccuracy => $"{AccuracyPercentage:F1}%";
         public string FormattedDamage => $"{DamageTaken} HP";
+        public float HeadshotPercentage => (ShotsHit > 0) ? ((float)HeadshotsCount / ShotsHit * 100f) : 0f;
+        public string FormattedHeadshots => $"{HeadshotPercentage:F1}%";
         public string GradeString => Grade.ToString();
 
         public TacticalDebriefData(
@@ -51,7 +56,8 @@ namespace NullProtocol.UI
             int shotsHit,
             int damageTaken,
             TacticalGrade grade,
-            int enemiesNeutralized = 0)
+            int enemiesNeutralized = 0,
+            int headshots = 0)
         {
             Subsector = subsector;
             SubsectorTitle = title;
@@ -62,6 +68,7 @@ namespace NullProtocol.UI
             DamageTaken = damageTaken;
             Grade = grade;
             EnemiesNeutralized = enemiesNeutralized;
+            HeadshotsCount = headshots;
         }
     }
 

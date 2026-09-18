@@ -33,6 +33,7 @@ namespace NullProtocol.UI
         private int _shotsHit;
         private int _damageTaken;
         private int _enemiesEliminated;
+        private int _headshotsCount;
         private int _lastPlayerHealth = 100;
 
         public SubsectorId Subsector => _subsectorId;
@@ -40,10 +41,12 @@ namespace NullProtocol.UI
         public float ElapsedTime => _elapsedTime;
         public int ShotsFired => _shotsFired;
         public int ShotsHit => _shotsHit;
+        public int HeadshotsCount => _headshotsCount;
         public int DamageTaken => _damageTaken;
         public int EnemiesEliminated => _enemiesEliminated;
 
         public float AccuracyPercentage => (_shotsFired > 0) ? ((float)_shotsHit / _shotsFired * 100f) : 100f;
+        public float HeadshotPercentage => (_shotsHit > 0) ? ((float)_headshotsCount / _shotsHit * 100f) : 0f;
 
         public event Action<TacticalDebriefData> OnDebriefReady;
 
@@ -122,6 +125,7 @@ namespace NullProtocol.UI
             _elapsedTime = 0f;
             _shotsFired = 0;
             _shotsHit = 0;
+            _headshotsCount = 0;
             _damageTaken = 0;
             _enemiesEliminated = 0;
             _lastPlayerHealth = 100;
@@ -142,6 +146,11 @@ namespace NullProtocol.UI
             _shotsHit++;
         }
 
+        public void RegisterHeadshot()
+        {
+            _headshotsCount++;
+        }
+
         public void RegisterDamageTaken(int amount)
         {
             if (amount > 0)
@@ -154,6 +163,10 @@ namespace NullProtocol.UI
         {
             // Damage dealt to a hostile constitutes a hit
             RegisterShotHit();
+            if (isHeadshot)
+            {
+                RegisterHeadshot();
+            }
         }
 
         private void HandleKill(IDamageable victim, bool isHeadshot, Vector3 hitPoint)
@@ -204,7 +217,8 @@ namespace NullProtocol.UI
                 _shotsHit,
                 _damageTaken,
                 grade,
-                _enemiesEliminated
+                enemiesNeutralized: _enemiesEliminated,
+                headshots: _headshotsCount
             );
         }
 
