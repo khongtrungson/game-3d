@@ -21,7 +21,8 @@ namespace NullProtocol.Editor
     /// <summary>
     /// Production Level Builder for Subsector 01 (Tactical Orientation / Brutalist Corridors).
     /// Assembles hand-crafted 4m grid rooms with real production 3D models, diegetic UI,
-    /// Hitscan weapon sockets, Sentinel AI archetypes, and Memory-Dump Loop (FR-28 to FR-33, EP-06).
+    /// Hitscan weapon sockets, Sentinel AI archetypes, Memory-Dump Loop,
+    /// and full integration of VFX and 3D HRTF Spatial Audio (FR-1 to FR-46, EP-06).
     /// </summary>
     public static class ProductionSceneBuilder
     {
@@ -45,6 +46,32 @@ namespace NullProtocol.Editor
         private const string PATH_SYNAPSE_AR = "Assets/Art/Weapons/SynapseAR/WEP_MOD_02_SynapseAR.glb";
         private const string PATH_VECTOR9 = "Assets/Art/Weapons/Vector9/WEP_MOD_01_Vector9.glb";
         private const string PATH_SENTINEL = "Assets/Art/Characters/Enemies/Sentinel/CHR_AI_SENTINEL.glb";
+
+        // Gadget 3D Models & VFX Prefabs
+        private const string PATH_GAD_PUCK = "Assets/Art/Gadgets/HardLightBarricade/GAD_MOD_01_PUCK.glb";
+        private const string PATH_GAD_BARRIER = "Assets/Art/Gadgets/HardLightBarricade/GAD_MOD_01_BARRIER.glb";
+        private const string PATH_GAD_CANISTER = "Assets/Art/Gadgets/NullCloudSmoke/GAD_MOD_02_CANISTER.glb";
+        private const string PATH_GAD_MINE = "Assets/Art/Gadgets/LogicTripMine/GAD_MOD_03_MINE.glb";
+
+        private const string PATH_VFX_BARRICADE_DEPLOY = "Assets/VFX/Gadgets/VFX_Barricade_Deploy.prefab";
+        private const string PATH_VFX_BARRICADE_SHATTER = "Assets/VFX/Gadgets/VFX_Barricade_Shatter.prefab";
+        private const string PATH_VFX_SMOKE_BURST = "Assets/VFX/Gadgets/VFX_NullCloud_Burst.prefab";
+        private const string PATH_VFX_MINE_LASER = "Assets/VFX/Gadgets/VFX_LogicTrip_Laser.prefab";
+        private const string PATH_VFX_MINE_FREEZE = "Assets/VFX/Gadgets/VFX_LogicTrip_Freeze.prefab";
+
+        private const string PATH_VFX_MUZZLE = "Assets/VFX/Weapons/VFX_Muzzle_Pistol.prefab";
+        private const string PATH_VFX_SPARKS = "Assets/VFX/Systems/VFX_Impact_Sparks.prefab";
+        private const string PATH_VFX_MEMORY_DUMP = "Assets/VFX/Systems/VFX_MemoryDump_Reset.prefab";
+
+        // Audio Clips
+        private const string PATH_SFX_SYN_FIRE = "Assets/Audio/SFX/Weapons/SFX-WEP-SYN-FIRE.wav";
+        private const string PATH_SFX_VEC9_FIRE = "Assets/Audio/SFX/Weapons/SFX-WEP-VEC9-FIRE.wav";
+        private const string PATH_SFX_IMPACT = "Assets/Audio/SFX/Impacts/SFX-BULLET-IMPACT-SURFACE.wav";
+        private const string PATH_SFX_STEP_WALK = "Assets/Audio/SFX/Locomotion/SFX-PLY-STEP-WALK.wav";
+        private const string PATH_SFX_STEP_SPRINT = "Assets/Audio/SFX/Locomotion/SFX-PLY-STEP-SPRINT.wav";
+        private const string PATH_SFX_STEP_CROUCH = "Assets/Audio/SFX/Locomotion/SFX-PLY-STEP-CROUCH.wav";
+        private const string PATH_SFX_DATACORE_IDLE = "Assets/Audio/SFX/Environment/SFX-ENV-DATACORE-IDLE.wav";
+        private const string PATH_SFX_GATEWAY_UNLOCK = "Assets/Audio/SFX/Environment/SFX-ENV-GATEWAY-UNLOCK.wav";
 
         [MenuItem("NullProtocol/Build Production Subsector 01 Scene", false, 2)]
         public static void BuildProductionSubsector01()
@@ -98,7 +125,7 @@ namespace NullProtocol.Editor
             spawnPointGo.transform.rotation = Quaternion.identity;
             SetPrivateField(room01, "_spawnPoint", spawnPointGo.transform);
 
-            // Floor 2x3 (X: -2, 2; Z: -4, 0, 4)
+            // Floor 2x3
             SpawnFloorGrid(room01Go.transform, new Vector2Int(2, 3), new Vector3(0f, 0f, 0f));
 
             // Perimeter walls
@@ -118,7 +145,7 @@ namespace NullProtocol.Editor
             SpawnDoorframe(room01Go.transform, new Vector3(0f, 0f, 6f), Quaternion.identity);
             SpawnWall(room01Go.transform, new Vector3(3f, 0f, 6f), Quaternion.identity);
 
-            // Tactical cover: 1 Cover Pillar to break sightline (FR-28: <= 12m sightlines)
+            // Tactical cover
             SpawnCoverPillar(room01Go.transform, new Vector3(-1.8f, 0f, 2f), CoverHeight.High, Vector3.forward);
 
             // 3. Room 2: Server Breach Hub (12m x 16m) (Z from 6 to 22)
@@ -132,10 +159,9 @@ namespace NullProtocol.Editor
             spawnPoint02.transform.position = new Vector3(0f, 0.1f, 7f);
             SetPrivateField(room02, "_spawnPoint", spawnPoint02.transform);
 
-            // Threshold marker at doorway entrance (Z = 6.2)
             SpawnThresholdMarker(room02Go.transform, new Vector3(0f, 0f, 6.2f), Quaternion.identity);
 
-            // Floor 3x4 (X: -4, 0, 4; Z: 8, 12, 16, 20)
+            // Floor 3x4
             SpawnFloorGrid(room02Go.transform, new Vector2Int(3, 4), new Vector3(0f, 0f, 14f));
 
             // Room 2 Perimeter Walls
@@ -149,7 +175,7 @@ namespace NullProtocol.Editor
             SpawnWall(room02Go.transform, new Vector3(6f, 0f, 16f), Quaternion.Euler(0, -90, 0));
             SpawnWall(room02Go.transform, new Vector3(6f, 0f, 20f), Quaternion.Euler(0, -90, 0));
 
-            // Low tactical cover for active crouching / peeking (FR-2, FR-6)
+            // Low tactical cover for active crouching / peeking
             SpawnLowCover(room02Go.transform, new Vector3(-2f, 0f, 12f), Quaternion.identity, CoverHeight.Low, Vector3.forward);
             SpawnLowCover(room02Go.transform, new Vector3(2.5f, 0f, 16f), Quaternion.Euler(0, 180, 0), CoverHeight.Low, -Vector3.forward);
             SpawnCoverPillar(room02Go.transform, new Vector3(3f, 0f, 11f), CoverHeight.High, -Vector3.right);
@@ -172,7 +198,7 @@ namespace NullProtocol.Editor
 
             SpawnThresholdMarker(room03Go.transform, new Vector3(0f, 0f, 22.2f), Quaternion.identity);
 
-            // Floor 3x4 (X: -4, 0, 4; Z: 24, 28, 32, 36)
+            // Floor 3x4
             SpawnFloorGrid(room03Go.transform, new Vector2Int(3, 4), new Vector3(0f, 0f, 30f));
 
             // Room 3 Perimeter Walls
@@ -186,7 +212,7 @@ namespace NullProtocol.Editor
             SpawnWall(room03Go.transform, new Vector3(6f, 0f, 32f), Quaternion.Euler(0, -90, 0));
             SpawnWall(room03Go.transform, new Vector3(6f, 0f, 36f), Quaternion.Euler(0, -90, 0));
 
-            // Central Data Core Terminal (FR-32: Mission Objective)
+            // Central Data Core Terminal (FR-32: Mission Objective) + SFX
             var terminal = SpawnDataCoreTerminal(room03Go.transform, new Vector3(0f, 0f, 30f), Quaternion.identity);
 
             // Defensive pillars flanking the Data Core
@@ -212,7 +238,7 @@ namespace NullProtocol.Editor
 
             SpawnThresholdMarker(room04Go.transform, new Vector3(0f, 0f, 38.2f), Quaternion.identity);
 
-            // Floor 2x3 (X: -2, 2; Z: 40, 44, 48)
+            // Floor 2x3
             SpawnFloorGrid(room04Go.transform, new Vector2Int(2, 3), new Vector3(0f, 0f, 44f));
 
             SpawnWall(room04Go.transform, new Vector3(-4f, 0f, 40f), Quaternion.Euler(0, 90, 0));
@@ -223,7 +249,7 @@ namespace NullProtocol.Editor
             SpawnWall(room04Go.transform, new Vector3(4f, 0f, 44f), Quaternion.Euler(0, -90, 0));
             SpawnWall(room04Go.transform, new Vector3(4f, 0f, 48f), Quaternion.Euler(0, -90, 0));
 
-            // Extraction Gateway at end of corridor (Z = 50)
+            // Extraction Gateway at end of corridor (Z = 50) + SFX
             var gateway = SpawnExtractionGateway(room04Go.transform, new Vector3(0f, 0f, 50f), Quaternion.Euler(0, 180, 0));
             gateway.RegisterRequiredTerminal(terminal);
             terminal.TargetGateway = gateway;
@@ -247,8 +273,18 @@ namespace NullProtocol.Editor
             SetPrivateField(locomotion, "_inputActions", inputActions);
             SetPrivateField(locomotion, "_playerStateEvents", playerStateEvents);
 
+            // Locomotion Acoustic Emitter with 3D HRTF Footsteps SFX (FR-7, FR-39)
             var acousticEmitter = playerGo.AddComponent<LocomotionAcousticEmitter>();
-            SetPrivateField(acousticEmitter, "_acousticChannel", acousticChannel);
+            var playerAudio = playerGo.AddComponent<AudioSource>();
+            playerAudio.spatialBlend = 1.0f;
+            playerAudio.spatialize = true;
+            playerAudio.playOnAwake = false;
+
+            SetPrivateField(acousticEmitter, "_acousticEvents", acousticChannel);
+            SetPrivateField(acousticEmitter, "_audioSource", playerAudio);
+            SetPrivateField(acousticEmitter, "_walkFootstepClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_STEP_WALK));
+            SetPrivateField(acousticEmitter, "_sprintFootstepClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_STEP_SPRINT));
+            SetPrivateField(acousticEmitter, "_crouchFootstepClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_STEP_CROUCH));
             SetPrivateField(locomotion, "_acousticEmitter", acousticEmitter);
 
             // Camera Mount & Leaning (FR-5: 18 deg roll, 0.35m lateral displacement)
@@ -279,10 +315,9 @@ namespace NullProtocol.Editor
 
             // First Person Viewmodel Arms (CHR_FP_ARMS.glb)
             var armsPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_FP_ARMS);
-            GameObject armsInstance = null;
             if (armsPrefab != null)
             {
-                armsInstance = Object.Instantiate(armsPrefab, cameraMountGo.transform);
+                var armsInstance = Object.Instantiate(armsPrefab, cameraMountGo.transform);
                 armsInstance.name = "Viewmodel_Arms";
                 armsInstance.transform.localPosition = new Vector3(0f, -0.2f, 0.25f);
                 armsInstance.transform.localRotation = Quaternion.identity;
@@ -335,6 +370,10 @@ namespace NullProtocol.Editor
             SetPrivateField(economyManager, "_gadgetChannel", gadgetChannel);
             SetPrivateField(combatController, "_economyManager", economyManager);
 
+            // Impact sparks prefab & audio clips for weapons
+            var impactSparksPrefab = AssetDatabase.LoadAssetAtPath<ParticleSystem>(PATH_VFX_SPARKS);
+            var ricochetClip = AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_IMPACT);
+
             // Primary Weapon: Synapse-AR (WEP_MOD_02_SynapseAR.glb)
             var synapseArPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_SYNAPSE_AR);
             GameObject synapseArGo;
@@ -360,8 +399,29 @@ namespace NullProtocol.Editor
             muzzleGo.transform.SetParent(synapseArGo.transform);
             muzzleGo.transform.localPosition = new Vector3(0f, 0.05f, 0.5f);
 
+            // Muzzle flash particle effect
+            var muzzlePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_VFX_MUZZLE);
+            ParticleSystem muzzleParticles = null;
+            if (muzzlePrefab != null)
+            {
+                var muzzleInstance = Object.Instantiate(muzzlePrefab, muzzleGo.transform);
+                muzzleParticles = muzzleInstance.GetComponentInChildren<ParticleSystem>();
+            }
+
             var receiverDisplay = synapseArGo.AddComponent<WeaponReceiverDisplay>();
             SetPrivateField(receiverDisplay, "_receiverRenderer", synapseArGo.GetComponentInChildren<Renderer>());
+
+            var synapseAudio = synapseArGo.AddComponent<AudioSource>();
+            synapseAudio.spatialBlend = 1.0f;
+            synapseAudio.spatialize = true;
+            synapseAudio.playOnAwake = false;
+
+            var synapseVFX = synapseArGo.AddComponent<WeaponVFXController>();
+            SetPrivateField(synapseVFX, "_muzzleFlashParticles", muzzleParticles);
+            SetPrivateField(synapseVFX, "_impactSparksPrefab", impactSparksPrefab);
+            SetPrivateField(synapseVFX, "_gunshotClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_SYN_FIRE));
+            SetPrivateField(synapseVFX, "_ricochetClip", ricochetClip);
+            SetPrivateField(synapseVFX, "_audioSource", synapseAudio);
 
             var synapseWeapon = synapseArGo.AddComponent<SynapseAR>();
             SetPrivateField(synapseWeapon, "_data", synapseArData);
@@ -369,6 +429,7 @@ namespace NullProtocol.Editor
             SetPrivateField(synapseWeapon, "_damageChannel", damageChannel);
             SetPrivateField(synapseWeapon, "_killChannel", killChannel);
             SetPrivateField(synapseWeapon, "_acousticChannel", acousticChannel);
+            SetPrivateField(synapseWeapon, "_vfx", synapseVFX);
 
             // Secondary Weapon: Vector-9 (WEP_MOD_01_Vector9.glb)
             var vector9Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_VECTOR9);
@@ -393,18 +454,30 @@ namespace NullProtocol.Editor
             muzzle9.transform.SetParent(vector9Go.transform);
             muzzle9.transform.localPosition = new Vector3(0f, 0.04f, 0.28f);
 
+            var vector9Audio = vector9Go.AddComponent<AudioSource>();
+            vector9Audio.spatialBlend = 1.0f;
+            vector9Audio.spatialize = true;
+            vector9Audio.playOnAwake = false;
+
+            var vector9VFX = vector9Go.AddComponent<WeaponVFXController>();
+            SetPrivateField(vector9VFX, "_impactSparksPrefab", impactSparksPrefab);
+            SetPrivateField(vector9VFX, "_gunshotClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_VEC9_FIRE));
+            SetPrivateField(vector9VFX, "_ricochetClip", ricochetClip);
+            SetPrivateField(vector9VFX, "_audioSource", vector9Audio);
+
             var vector9Weapon = vector9Go.AddComponent<Vector9Pistol>();
             SetPrivateField(vector9Weapon, "_data", vector9Data);
             SetPrivateField(vector9Weapon, "_muzzlePoint", muzzle9.transform);
             SetPrivateField(vector9Weapon, "_damageChannel", damageChannel);
             SetPrivateField(vector9Weapon, "_killChannel", killChannel);
             SetPrivateField(vector9Weapon, "_acousticChannel", acousticChannel);
+            SetPrivateField(vector9Weapon, "_vfx", vector9VFX);
 
             var weaponList = new List<BaseWeapon> { synapseWeapon, vector9Weapon };
             SetPrivateField(combatController, "_weapons", weaponList);
             SetPrivateField(combatController, "_currentWeaponIndex", 0);
 
-            // Player Gadget Controller
+            // Player Gadget Controller & Setup Prefabs
             var gadgetController = playerGo.AddComponent<PlayerGadgetController>();
             SetPrivateField(gadgetController, "_playerCamera", cam);
             SetPrivateField(gadgetController, "_throwOrigin", muzzleGo.transform);
@@ -412,18 +485,17 @@ namespace NullProtocol.Editor
             SetPrivateField(gadgetController, "_inputActions", inputActions);
             SetPrivateField(watchDisplay, "_gadgetController", gadgetController);
 
+            SetupGadgetPrefabs(gadgetController);
+
             // 7. Tactical Sentinels (FR-22 to FR-27)
-            // Sentry 1: Room 1 entry guardian behind Cover Pillar
             var sentinel01 = SpawnSentinel(room01Go.transform, "Sentinel_R1_Sentry", new Vector3(-2f, 0f, 3.5f), Quaternion.Euler(0, 180, 0), playerGo.transform, acousticChannel, radioChannel, killChannel);
             room01.RegisterResettable(sentinel01);
 
-            // Sentry 2 & 3: Room 2 defenders in tactical cover
             var sentinel02 = SpawnSentinel(room02Go.transform, "Sentinel_R2_Flanker", new Vector3(-2f, 0f, 13.5f), Quaternion.Euler(0, 180, 0), playerGo.transform, acousticChannel, radioChannel, killChannel);
             var sentinel03 = SpawnSentinel(room02Go.transform, "Sentinel_R2_Anchor", new Vector3(2.5f, 0f, 17.5f), Quaternion.Euler(0, 180, 0), playerGo.transform, acousticChannel, radioChannel, killChannel);
             room02.RegisterResettable(sentinel02);
             room02.RegisterResettable(sentinel03);
 
-            // Sentry 4 & 5: Room 3 Data Core defenders
             var sentinel04 = SpawnSentinel(room03Go.transform, "Sentinel_R3_CoreGuard_Left", new Vector3(-3.5f, 0f, 32f), Quaternion.Euler(0, 180, 0), playerGo.transform, acousticChannel, radioChannel, killChannel);
             var sentinel05 = SpawnSentinel(room03Go.transform, "Sentinel_R3_CoreGuard_Right", new Vector3(3.5f, 0f, 32f), Quaternion.Euler(0, 180, 0), playerGo.transform, acousticChannel, radioChannel, killChannel);
             room03.RegisterResettable(sentinel04);
@@ -445,6 +517,14 @@ namespace NullProtocol.Editor
             SetPrivateField(memDump, "_playerGadgets", gadgetController);
             SetPrivateField(memDump, "_activeRoom", room01);
 
+            // Memory-Dump reset VFX system
+            var memoryDumpVfxPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_VFX_MEMORY_DUMP);
+            if (memoryDumpVfxPrefab != null)
+            {
+                var vfxResetInstance = Object.Instantiate(memoryDumpVfxPrefab, cameraMountGo.transform);
+                vfxResetInstance.name = "VFX_MemoryDump_Overlay";
+            }
+
             var settingsGo = new GameObject("SettingsManager");
             settingsGo.transform.SetParent(managersRoot.transform);
             var settingsManager = settingsGo.AddComponent<SettingsManager>();
@@ -463,10 +543,94 @@ namespace NullProtocol.Editor
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
 
-            Debug.Log("[ProductionSceneBuilder] Subsector 01 fully assembled with production 3D assets, NavMesh baked, and saved!");
+            Debug.Log("[ProductionSceneBuilder] Subsector 01 fully assembled with 3D assets, VFX, and Spatial Audio!");
         }
 
         #region Helper Spawners
+        private static void SetupGadgetPrefabs(PlayerGadgetController gadgetController)
+        {
+            // Puck
+            var puckGo = new GameObject("Prefab_BarricadePuck");
+            puckGo.SetActive(false);
+            var puckModel = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_GAD_PUCK);
+            if (puckModel != null)
+            {
+                var m = Object.Instantiate(puckModel, puckGo.transform);
+                m.transform.localPosition = Vector3.zero;
+            }
+            var puckSphere = puckGo.AddComponent<SphereCollider>();
+            puckSphere.radius = 0.2f;
+            var puckComp = puckGo.AddComponent<BarricadePuck>();
+            SetPrivateField(gadgetController, "_puckPrefab", puckComp);
+
+            // Barricade
+            var barricadeGo = new GameObject("Prefab_DeployableBarricade");
+            barricadeGo.SetActive(false);
+            var barrierModel = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_GAD_BARRIER);
+            if (barrierModel != null)
+            {
+                var m = Object.Instantiate(barrierModel, barricadeGo.transform);
+                m.transform.localPosition = Vector3.zero;
+            }
+            var vfxDeploy = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_VFX_BARRICADE_DEPLOY);
+            if (vfxDeploy != null)
+            {
+                var v = Object.Instantiate(vfxDeploy, barricadeGo.transform);
+                v.transform.localPosition = Vector3.zero;
+            }
+            var barricadeComp = barricadeGo.AddComponent<DeployableBarricade>();
+            SetPrivateField(gadgetController, "_barricadePrefab", barricadeComp);
+
+            // Smoke Canister
+            var canisterGo = new GameObject("Prefab_SmokeCanister");
+            canisterGo.SetActive(false);
+            var canisterModel = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_GAD_CANISTER);
+            if (canisterModel != null)
+            {
+                var m = Object.Instantiate(canisterModel, canisterGo.transform);
+                m.transform.localPosition = Vector3.zero;
+            }
+            var canisterSphere = canisterGo.AddComponent<SphereCollider>();
+            canisterSphere.radius = 0.15f;
+            var canisterComp = canisterGo.AddComponent<SmokeCanister>();
+            SetPrivateField(gadgetController, "_smokeCanisterPrefab", canisterComp);
+
+            // Null-Cloud Smoke Volume
+            var smokeGo = new GameObject("Prefab_NullCloudSmoke");
+            smokeGo.SetActive(false);
+            var vfxSmoke = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_VFX_SMOKE_BURST);
+            if (vfxSmoke != null)
+            {
+                var v = Object.Instantiate(vfxSmoke, smokeGo.transform);
+                v.transform.localPosition = Vector3.zero;
+            }
+            var smokeSphere = smokeGo.AddComponent<SphereCollider>();
+            smokeSphere.isTrigger = true;
+            smokeSphere.radius = 2.0f; // 4m diameter
+            var smokeComp = smokeGo.AddComponent<NullCloudSmoke>();
+            SetPrivateField(gadgetController, "_smokePrefab", smokeComp);
+
+            // Logic-Trip Mine
+            var mineGo = new GameObject("Prefab_LogicTripMine");
+            mineGo.SetActive(false);
+            var mineModel = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_GAD_MINE);
+            if (mineModel != null)
+            {
+                var m = Object.Instantiate(mineModel, mineGo.transform);
+                m.transform.localPosition = Vector3.zero;
+            }
+            var vfxLaser = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_VFX_MINE_LASER);
+            if (vfxLaser != null)
+            {
+                var v = Object.Instantiate(vfxLaser, mineGo.transform);
+                v.transform.localPosition = Vector3.zero;
+            }
+            var mineBox = mineGo.AddComponent<BoxCollider>();
+            mineBox.size = new Vector3(0.2f, 0.2f, 0.2f);
+            var mineComp = mineGo.AddComponent<LogicTripMine>();
+            SetPrivateField(gadgetController, "_tripMinePrefab", mineComp);
+        }
+
         private static void SpawnFloorGrid(Transform parent, Vector2Int count, Vector3 center)
         {
             var floorPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PATH_FLOOR);
@@ -539,7 +703,6 @@ namespace NullProtocol.Editor
                 frame.transform.rotation = rot;
             }
             frame.tag = Tags.GridWall;
-            // Left jamb, right jamb, lintel colliders
             EnsureBoxCollider(frame, new Vector3(0.9f, 3.0f, 0.4f), new Vector3(-1.55f, 1.5f, 0f));
             var rightCol = frame.AddComponent<BoxCollider>();
             rightCol.size = new Vector3(0.9f, 3.0f, 0.4f);
@@ -632,6 +795,14 @@ namespace NullProtocol.Editor
                 terminalGo.transform.localScale = new Vector3(1.2f, 0.8f, 1.2f);
             }
             EnsureBoxCollider(terminalGo, new Vector3(1.2f, 1.6f, 0.8f), new Vector3(0f, 0.8f, 0f));
+
+            var audio = terminalGo.AddComponent<AudioSource>();
+            audio.spatialBlend = 1.0f;
+            audio.spatialize = true;
+            audio.loop = true;
+            audio.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_DATACORE_IDLE);
+            if (audio.clip != null) audio.Play();
+
             var terminal = terminalGo.AddComponent<DataCoreTerminal>();
             return terminal;
         }
@@ -654,6 +825,13 @@ namespace NullProtocol.Editor
                 gatewayGo.transform.localScale = new Vector3(4f, 4f, 0.6f);
             }
             var col = EnsureBoxCollider(gatewayGo, new Vector3(4f, 4f, 0.6f), new Vector3(0f, 2f, 0f));
+
+            var audio = gatewayGo.AddComponent<AudioSource>();
+            audio.spatialBlend = 1.0f;
+            audio.spatialize = true;
+            audio.playOnAwake = false;
+            audio.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(PATH_SFX_GATEWAY_UNLOCK);
+
             var gateway = gatewayGo.AddComponent<ExtractionGateway>();
             SetPrivateField(gateway, "_physicalBarrier", col);
             return gateway;
@@ -709,11 +887,18 @@ namespace NullProtocol.Editor
             SetPrivateField(perception, "_eyeTransform", headGo.transform);
             SetPrivateField(perception, "_acousticChannel", acousticChannel);
 
+            var radioAudio = sentinelGo.AddComponent<AudioSource>();
+            radioAudio.spatialBlend = 1.0f;
+            radioAudio.spatialize = true;
+            radioAudio.playOnAwake = false;
+
             var radio = sentinelGo.AddComponent<SentinelRadioChatter>();
             SetPrivateField(radio, "_radioChannel", radioChannel);
 
             // Voxel Shatter Death FX (FR-38)
-            sentinelGo.AddComponent<SentinelVoxelShatterDeath>();
+            var voxelDeath = sentinelGo.AddComponent<SentinelVoxelShatterDeath>();
+            var voxelMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/M_Brutalist_White.mat");
+            SetPrivateField(voxelDeath, "_wireframeVoxelMaterial", voxelMat);
 
             // HFSM Core
             var standardSentinel = sentinelGo.AddComponent<StandardSentinel>();
