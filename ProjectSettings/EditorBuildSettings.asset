@@ -8,6 +8,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Subsector02_CorruptedArchives.unity
+    guid: 4d679f71e4675c3f695c1296c5a5ec78
+  - enabled: 1
+    path: Assets/Scenes/Subsector03_RootCore.unity
+    guid: 5bd77ad20cc61848792327e77ff59082
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
