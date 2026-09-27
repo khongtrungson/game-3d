@@ -120,8 +120,13 @@ namespace NullProtocol.Combat
                 voxel.transform.position = origin + randomOffset;
                 voxel.transform.rotation = Random.rotation;
 
-                // Physics
-                var rb = voxel.GetComponent<Rigidbody>() ?? voxel.AddComponent<Rigidbody>();
+                // Physics - SỬA LỖI TẠI ĐÂY: Dùng kiểm tra if (rb == null) chuẩn của Unity thay vì toán tử ??
+                var rb = voxel.GetComponent<Rigidbody>();
+                if (rb == null)
+                {
+                    rb = voxel.AddComponent<Rigidbody>();
+                }
+
                 rb.mass = 0.2f;
                 rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
 
@@ -160,8 +165,6 @@ namespace NullProtocol.Combat
         {
             float elapsed = 0f;
             Vector3 startScale = Vector3.one * _voxelSize;
-            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-            int alphaPropId = Shader.PropertyToID("_BaseColor");
 
             while (elapsed < duration)
             {

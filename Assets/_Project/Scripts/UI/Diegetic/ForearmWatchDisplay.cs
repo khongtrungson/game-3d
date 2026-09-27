@@ -39,15 +39,6 @@ namespace NullProtocol.UI
         [SerializeField] private float _warningThreshold = 0.5f;
         [SerializeField] private float _criticalThreshold = 0.25f;
 
-        public void ApplyWireframeTheme(WireframeTheme theme)
-        {
-            var palette = WireframeThemePalette.GetPalette(theme);
-            _healthyColor = palette.PrimaryColor * 2.0f;
-            _warningColor = palette.SecondaryColor * 2.5f;
-            _criticalColor = palette.CriticalColor * 3.0f;
-            UpdateWatchDisplay();
-        }
-
         [Header("Event Channels")]
         [SerializeField] private PlayerStateEventChannelSO _playerStateEvents;
         [SerializeField] private GadgetEventChannelSO _gadgetEvents;
@@ -76,6 +67,15 @@ namespace NullProtocol.UI
         public int BarricadeCharges => _barricadeCharges;
         public int SmokeCharges => _smokeCharges;
         public int TripMineCharges => _tripMineCharges;
+
+        public void ApplyWireframeTheme(WireframeTheme theme)
+        {
+            var palette = WireframeThemePalette.GetPalette(theme);
+            _healthyColor = palette.PrimaryColor * 2.0f;
+            _warningColor = palette.SecondaryColor * 2.5f;
+            _criticalColor = palette.CriticalColor * 3.0f;
+            UpdateWatchDisplay();
+        }
 
         private void Awake()
         {
@@ -193,7 +193,8 @@ namespace NullProtocol.UI
             if (_oledScreenRenderer == null) return;
             if (_propBlock == null) _propBlock = new MaterialPropertyBlock();
 
-            _oledScreenRenderer.GetPropertyBlock(_propBlock, _materialIndex);
+            _propBlock.Clear();
+            _oledScreenRenderer.SetPropertyBlock(null, _materialIndex);
 
             float healthNorm = (_maxHealth > 0) ? (float)_currentHealth / _maxHealth : 0f;
             Color emissiveColor = GetCurrentHealthColor();
@@ -204,7 +205,16 @@ namespace NullProtocol.UI
             _propBlock.SetFloat(_barricadeChargesPropId, _barricadeCharges);
             _propBlock.SetFloat(_smokeChargesPropId, _smokeCharges);
             _propBlock.SetFloat(_tripMineChargesPropId, _tripMineCharges);
-            _propBlock.SetColor(_screenEmissiveColorPropId, emissiveColor);
+
+            // Bọc kiểm tra an toàn để tránh crash khi xung đột Property ID type
+            try
+            {
+                _propBlock.SetColor(_screenEmissiveColorPropId, emissiveColor);
+            }
+            catch (System.InvalidOperationException ex)
+            {
+                Debug.LogWarning($"[ForearmWatchDisplay] Property ID conflict on '{_screenEmissiveColorPropName}'. Check Shader & Inspector assigned property names. Details: {ex.Message}");
+            }
 
             _oledScreenRenderer.SetPropertyBlock(_propBlock, _materialIndex);
         }

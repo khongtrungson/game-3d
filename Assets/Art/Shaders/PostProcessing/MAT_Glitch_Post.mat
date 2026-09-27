@@ -38,13 +38,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _GlitchIntensity: 0.0
-    - _RGBSplit: 0.035
-    - _HorizontalDisplacement: 0.045
-    - _ScanlineFrequency: 360.0
+    - _DeRefCollapse: 0
+    - _FlashIntensity: 0
+    - _GlitchIntensity: 0
+    - _HorizontalDisplacement: 0
+    - _RGBSplit: 0
+    - _ScanlineFrequency: 360
     - _ScanlineIntensity: 0.5
-    - _DeRefCollapse: 0.0
-    - _FlashIntensity: 0.0
     m_Colors:
     - _GlitchTint: {r: 0, g: 0.95, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
