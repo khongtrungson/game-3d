@@ -1,60 +1,64 @@
 using UnityEngine;
 
-public class time_manager : MonoBehaviour {
-
-	public float slowdownFactor = 0.05f;
-	public float slowdownLength = 2f;
-    private GameObject[] enemies,in_enemy;
-    private int count=0;
-
-void Start(){
-    in_enemy=GameObject.FindGameObjectsWithTag("enemy");
-}
-	void Update()
+public class time_manager : MonoBehaviour 
 {
-    enemies = GameObject.FindGameObjectsWithTag("enemy");
+    public float slowdownFactor = 0.05f;
+    public float slowdownLength = 2f;
+    private GameObject[] enemies, in_enemy;
+    private int count = 0;
 
-    // 1. Kiểm tra nếu không có enemy nào thì dừng, tránh truy cập enemies[0] gây lỗi IndexOutOfRangeException
-    if (enemies == null || enemies.Length == 0) return;
-
-    if (count == 1)
+    void Start()
     {
-        Invoke("time_normal", 0.8f);
+        in_enemy = GameObject.FindGameObjectsWithTag("enemy");
     }
 
-    // 2. Chỉ kiểm tra Slowmotion khi đúng thời điểm còn lại duy nhất 1 enemy và chưa kích hoạt slow (count == 0)
-    if (enemies.Length == 1 && count == 0)
+    void Update()
     {
-        GameObject enemy = enemies[0];
-        
-        if (enemy != null)
-        {
-            Enemy_health eh = enemy.GetComponent<Enemy_health>();
-            fly_enemy_health_script eh2 = enemy.GetComponent<fly_enemy_health_script>();
+        enemies = GameObject.FindGameObjectsWithTag("enemy");
 
-            // Kiểm tra máu của Enemy_health
-            if (eh != null && eh.health <= 5)
-            {
-                DoSlowmotion();
-                count += 1;
-            }
-            // Kiểm tra máu của fly_enemy_health_script
-            else if (eh2 != null && eh2.health <= 5)
-            {
-                DoSlowmotion();
-                count += 1;
-            }
+        // 1. Kiểm tra nếu không có enemy nào thì dừng xử lý để tránh lỗi mảng rỗng
+        if (enemies == null || enemies.Length == 0) 
+            return;
+
+        // Chỉ truy cập phần tử khi mảng chắc chắn có ít nhất 1 enemy
+        GameObject enemy = enemies[0];
+        if (enemy == null) 
+            return;
+
+        Enemy_health eh = enemy.GetComponent<Enemy_health>();
+        fly_enemy_health_script eh2 = enemy.GetComponent<fly_enemy_health_script>();
+
+        // 2. Sửa lỗi kiểm tra lượng máu an toàn cho cả 2 loại Enemy
+        float currentHealth = 999f;
+        if (eh != null) 
+        {
+            currentHealth = eh.health;
+        } 
+        else if (eh2 != null) 
+        {
+            currentHealth = eh2.health;
+        }
+
+        // 3. Kích hoạt Slow motion khi còn đúng 1 enemy và máu <= 5
+        if (enemies.Length == 1 && currentHealth <= 5 && count == 0)
+        {
+            DoSlowmotion();
+            count = 1; // Đánh dấu đã kích hoạt Slowmotion
+
+            // Chỉ gọi Invoke duy nhất 1 lần tại đây
+            Invoke("time_normal", 0.8f); 
         }
     }
-}
 
-	public void DoSlowmotion ()
-	{
-		Time.timeScale = slowdownFactor;
-		Time.fixedDeltaTime = Time.timeScale * .02f;
-	}
- 
- private void time_normal(){
-            Time.timeScale=1f;
- }
+    public void DoSlowmotion()
+    {
+        Time.timeScale = slowdownFactor;
+        Time.fixedDeltaTime = Time.timeScale * 0.02f;
+    }
+
+    private void time_normal()
+    {
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f; // Khôi phục lại fixedDeltaTime chuẩn của Unity
+    }
 }

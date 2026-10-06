@@ -93,7 +93,7 @@ void Update () {
        else{
             enemy_dying=Resources.Load<AudioClip> ("enemy_dying");
        }
-        //player  = GameObject.FindGameObjectWithTag("playergun").transform;
+        player  = GameObject.FindGameObjectWithTag("playergun").transform;
         
     if(health>0 && health+recharge_health<=100 && Time.time>cooldown_time && is_attacking==false){
         health+=recharge_health;

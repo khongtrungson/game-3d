@@ -11,6 +11,7 @@ public class score_kill : MonoBehaviour
     public TMP_Text kill, grenade;
     public front_canvas_score_kill_script fpsk;
     public TMP_Text timer;
+    
     private GameObject[] grenades;
     private GameObject time_finish, enemy_finish;
     private float initial_timevalue = 1200;
@@ -18,25 +19,21 @@ public class score_kill : MonoBehaviour
 
     void Start()
     {
-        // 1. Tự động tìm component fpsk nếu chưa gán qua Inspector
+        // Tự động tìm fpsk nếu chưa kéo thả vào Inspector
         if (fpsk == null)
         {
-            fpsk = FindFirstObjectByType<front_canvas_score_kill_script>();
-            // Nếu dùng Unity bản cũ (2022 trở xuống), thay dòng trên bằng:
-            // fpsk = FindObjectOfType<front_canvas_score_kill_script>();
+            fpsk = FindObjectOfType<front_canvas_score_kill_script>();
         }
 
-        // 2. Lấy danh sách kẻ địch ban đầu
         initial_enemies = GameObject.FindGameObjectsWithTag("enemy");
 
-        // 3. Kiểm tra an toàn trước khi gán
         if (fpsk != null)
         {
             fpsk.initial_enemies_length = initial_enemies.Length;
         }
         else
         {
-            //Debug.LogError("Chưa gán hoặc không tìm thấy 'front_canvas_score_kill_script' trong Scene!");
+            Debug.LogWarning("Chưa gán fpsk (front_canvas_score_kill_script)!");
         }
     }
 
@@ -44,29 +41,26 @@ public class score_kill : MonoBehaviour
     {
         enemies = GameObject.FindGameObjectsWithTag("enemy");
         
-        // Kiểm tra fpsk null trước khi cập nhật dữ liệu liên tục
         if (fpsk != null)
         {
             fpsk.enemies_length = enemies.Length;
-            fpsk.time_left = initial_timevalue - timevalue;
         }
 
         grenades = GameObject.FindGameObjectsWithTag("grenade");
 
+        // 1. Kiểm tra UI Grenade
         if (grenade != null)
         {
             grenade.text = grenades.Length.ToString() + "/8";
         }
-        else
-        {
-            Debug.LogWarning("Chưa kéo thả UI Text vào ô 'grenade' trong Inspector!");
-        }
 
+        // 2. Kiểm tra UI Kill
         if (kill != null)
         {
             kill.text = "Kill:" + (initial_enemies.Length - enemies.Length).ToString() + "/" + initial_enemies.Length.ToString();
         }
 
+        // Xử lý khi diệt hết quái
         if (enemies.Length == 0)
         {
             enemy_finish = GameObject.FindGameObjectWithTag("enemy_finish");
@@ -76,6 +70,7 @@ public class score_kill : MonoBehaviour
             }
         }
 
+        // Xử lý đếm ngược thời gian
         if (timevalue > 0)
         {
             timevalue -= Time.deltaTime;
@@ -90,14 +85,19 @@ public class score_kill : MonoBehaviour
             }
         }
 
-        if (timevalue < 30 && timer != null)
-        {
-            timer.color = new Color32(255, 0, 27, 255);
-        }
-
+        // 3. Kiểm tra UI Timer trước khi đổi màu (Tránh lỗi dòng 43)
         if (timer != null)
         {
+            if (timevalue < 30)
+            {
+                timer.color = new Color32(255, 0, 27, 255);
+            }
             DisplayTime(timevalue);
+        }
+
+        if (fpsk != null)
+        {
+            fpsk.time_left = initial_timevalue - timevalue;
         }
     }
 
@@ -109,6 +109,10 @@ public class score_kill : MonoBehaviour
         }
         float minutes = Mathf.FloorToInt(timetodisplay / 60);
         float seconds = Mathf.FloorToInt(timetodisplay % 60);
-        timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+        if (timer != null)
+        {
+            timer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        }
     }
 }
