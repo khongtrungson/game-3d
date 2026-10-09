@@ -21,7 +21,7 @@ while(slider.value!=slider.maxValue){
      slider.value=progress;
      progress+=1f;
     if(slider.value==slider.maxValue){
-        SceneManager.LoadSceneAsync("zombie_level");
+        SceneManager.LoadSceneAsync("level 2");
     }
     yield return null;
 }

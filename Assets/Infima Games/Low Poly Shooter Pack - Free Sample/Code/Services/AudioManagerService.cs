@@ -47,12 +47,14 @@ namespace InfimaGames.LowPolyShooterPack
         /// </summary>
         private IEnumerator DestroySourceWhenFinished(AudioSource source)
         {
-            //Wait for the audio source to complete playing the clip.
-            yield return new WaitWhile(() => source.isPlaying);
-            
-            //Destroy the audio game object, since we're not using it anymore.
-            //This isn't really too great for performance, but it works, for now.
-            DestroyImmediate(source.gameObject);
+            // Đảm bảo dừng chờ nếu source đã bị Destroy hoặc ngừng phát
+            yield return new WaitWhile(() => source != null && source.isPlaying);
+
+            // Kiểm tra trước khi xóa GameObject chứa AudioSource
+            if (source != null)
+            {
+                Destroy(source.gameObject);
+            }
         }
 
         /// <summary>
