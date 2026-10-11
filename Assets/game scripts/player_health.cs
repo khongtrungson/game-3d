@@ -11,6 +11,7 @@ public class player_health : MonoBehaviour
 
     [Header("UI Settings")]
     public health_bar_script hbs;
+    public DeathScreen deathScreen; // Tham chiếu đến script DeathScreen để hiển thị màn hình chết
 
     [Header("Audio Settings")]
     public AudioSource audioSource;
@@ -65,7 +66,12 @@ public class player_health : MonoBehaviour
             audioSource.PlayOneShot(player_dying);
         }
         
-        yield return new WaitForSeconds(3f);
+        if (deathScreen != null)
+        {
+            deathScreen.showDeadScreen = true;
+        }
+
+        yield return new WaitForSeconds(0f);
         player_dead = true;
         isPlayingAnim = false;
     }

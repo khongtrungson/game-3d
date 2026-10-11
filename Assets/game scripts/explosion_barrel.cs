@@ -22,15 +22,20 @@ public class explosion_barrel : MonoBehaviour
     }
 
     public void TakeDamage(){
-        if(barrel_health>0){
-            barrel_health-=20f;
-        }
-        else{
-             StartCoroutine(after_dead_animation());
-             barrel_aduio.PlayOneShot(explode_);
-             Invoke("dead_",1f);
-        }
+    if(barrel_health > 0){
+        barrel_health -= 20f;
     }
+    else{
+        StartCoroutine(after_dead_animation());
+        
+        // Kiểm tra an toàn chống lỗi MissingReference
+        if(barrel_aduio != null && explode_ != null){
+            barrel_aduio.PlayOneShot(explode_);
+        }
+        
+        Invoke("dead_", 1f);
+    }
+}
 private void dead_(){
     Destroy(gameObject);
        enemies=GameObject.FindGameObjectsWithTag("enemy");

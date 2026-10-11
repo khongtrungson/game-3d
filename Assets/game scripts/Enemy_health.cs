@@ -6,116 +6,143 @@ using UnityEngine.AI;
 
 public class Enemy_health : MonoBehaviour
 {
-    public float health=100f;
+    [Header("Health Settings")]
+    public float max_health = 100f;
+    public float health = 100f;
+    public float recharge_health = 3f;
+    public float cooling_rate = 5f;
+    private float cooldown_time = 0f;
+
+    [Header("Components")]
     public Animator anim;
-    Transform player;
-    Transform own;
-    public bool isPlayingAnim=true;
     private NavMeshAgent nvm;
-    public float cooldown_time=0f;
-    public float cooling_rate=5f;
-    public float recharge_health=3f;
     private AudioSource audioSource;
-	public AudioClip enemy_hurt;
+    public health_bar_script hbs;
+
+    [Header("Audio & FX")]
+    public AudioClip enemy_hurt;
+    public AudioClip enemy_dying;
     public Transform blood_point;
     public Collider head;
     public GameObject head_loss;
-    public health_bar_script hbs;
-    private GameObject enemy_death_smoke;
-    bool is_attacking=false;
+
+    [Header("Status")]
+    public bool isDead = false;
+    private bool is_attacking = false;
     public bool enemy_hurting;
-    public AudioClip enemy_dying;
-     private float false_rest=3f;
+    private float false_rest = 3f;
 
-    private float max_health=100f;
-    private float Count=0f;
+    // Tham chiếu đến script AI để đồng bộ hóa hành vi chết
+    private WaypointZombieAI zombieAI;
 
-    public void TakeDamage(float amount){
-        if(health>0){
-         health-=amount;
-         is_attacking=false;
-         audioSource.PlayOneShot(enemy_hurt);
+    void Start()
+    {
+        // Tối ưu: Lấy các component 1 lần duy nhất khi game bắt đầu thay vì gọi trong Update
+        health = max_health;
+        audioSource = GetComponent<AudioSource>();
+        nvm = GetComponent<NavMeshAgent>();
+        anim = GetComponent<Animator>();
+        zombieAI = GetComponent<WaypointZombieAI>();
+
+        // Tải sẵn Audio từ thư mục Resources để tránh lag khung hình
+        enemy_hurt = Resources.Load<AudioClip>("enemy_hurt");
+
+        Transform own = transform;
+        if (own.GetComponent<soldier_enemyController>() == null)
+        {
+            enemy_dying = Resources.Load<AudioClip>("zombie_dying");
         }
-         else  if(health<=0){
-             enemy_hurting=false;
-             nvm=GetComponent<NavMeshAgent>();
-             nvm.enabled=false;
-             is_attacking=true;
-             StartCoroutine(PlayAnim());
-         }
-    }
-    private void Die(){
-        Destroy(gameObject);
+        else
+        {
+            enemy_dying = Resources.Load<AudioClip>("enemy_dying");
+        }
     }
 
-private IEnumerator after_dead_animation(){
-  yield  return new WaitForSeconds(0f);
-   GameObject _effect=Instantiate(enemy_death_smoke,own.position,Quaternion.identity);
-    GameObject _effect2=Instantiate(enemy_death_smoke,own.position,Quaternion.identity);
-     GameObject _effect3=Instantiate(enemy_death_smoke,own.position,Quaternion.identity);
-   Destroy(_effect,6f);
-   Destroy(_effect2,6f);
-   Destroy(_effect3,6f);
+    void Update()
+    {
+        if (isDead) return;
 
-}
+        enemy_hurting = enemy_hurt_false(enemy_hurting);
 
+        // Cập nhật thanh máu UI
+        if (hbs != null)
+        {
+            hbs.setmaxhealth(max_health);
+            hbs.sethealth(health);
+        }
 
-private IEnumerator PlayAnim () {
-    isPlayingAnim = true;
-    anim = GetComponent<Animator>();
-    anim.SetTrigger("die");
-    audioSource.PlayOneShot(enemy_dying);
-    StartCoroutine(after_dead_animation());
-    yield return new WaitForSeconds(5.1f);
- 
-    isPlayingAnim = false;
-}
- 
-    private bool enemy_hurt_false(bool x ){
-        if(Time.time>false_rest){
-            x=false;
-            false_rest=Time.time+1f;
+        // Hồi máu theo thời gian nếu chưa chết và không tấn công
+        if (health > 0 && health + recharge_health <= max_health && Time.time > cooldown_time && !is_attacking)
+        {
+            health += recharge_health;
+            cooldown_time = Time.time + cooling_rate;
+        }
+    }
+
+    public void TakeDamage(float amount)
+    {
+        if (isDead) return;
+
+        health -= amount;
+        is_attacking = false;
+
+        if (audioSource != null && enemy_hurt != null)
+        {
+            audioSource.PlayOneShot(enemy_hurt);
+        }
+
+        // Đồng thời báo cho script AI biết để chuyển trạng thái đuổi theo nếu đang đi tuần
+        if (zombieAI != null)
+        {
+            zombieAI.TakeDamage(Mathf.RoundToInt(amount));
+        }
+
+        if (health <= 0)
+        {
+            health = 0;
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        enemy_hurting = false;
+
+        // Vô hiệu hóa NavMeshAgent và Collider nếu có
+        if (nvm != null) nvm.enabled = false;
+
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        // Phát âm thanh chết và chạy animation
+        if (audioSource != null && enemy_dying != null)
+        {
+            audioSource.PlayOneShot(enemy_dying);
+        }
+
+        if (anim != null)
+        {
+            // Nếu Animator của bạn dùng Trigger "die"
+            //anim.SetTrigger("die");
+            
+            // Hoặc nếu bạn muốn dùng chung Boolean "IsDead" giống WaypointZombieAI, hãy bật dòng dưới:
+            anim.SetBool("IsDead", true);
+        }
+
+        // Hủy GameObject sau 5 giây (hoặc chỉnh lại thời lượng tùy ý)
+        Destroy(gameObject, 7f);
+    }
+
+    private bool enemy_hurt_false(bool x)
+    {
+        if (Time.time > false_rest)
+        {
+            x = false;
+            false_rest = Time.time + 1f;
         }
         return x;
     }
-// Called every frame
-void Update () {
-    enemy_hurting=enemy_hurt_false(enemy_hurting);
-    hbs.setmaxhealth(max_health);
-    hbs.sethealth(health);
-       audioSource=GetComponent<AudioSource>();
-       enemy_death_smoke=Resources.Load<GameObject>("after_zombie_death");
-       enemy_hurt=Resources.Load<AudioClip> ("enemy_hurt");
-       own=GetComponent<Transform>(); 
-       if(own.GetComponent<soldier_enemyController>()==null){
-         enemy_dying=Resources.Load<AudioClip> ("zombie_dying");
-       }
-       else{
-            enemy_dying=Resources.Load<AudioClip> ("enemy_dying");
-       }
-        player  = GameObject.FindGameObjectWithTag("playergun").transform;
-        
-    if(health>0 && health+recharge_health<=100 && Time.time>cooldown_time && is_attacking==false){
-        health+=recharge_health;
-        cooldown_time=Time.time+cooling_rate;
-    }
-    if(health<=0){
-        enemy_hurting=false;
-        if(Count==0){
-         nvm=GetComponent<NavMeshAgent>();
-             nvm.enabled=false;
-             is_attacking=true;
-             StartCoroutine(PlayAnim());
-             Count+=1;
-        }
-    }
-    if (!isPlayingAnim && health<=0) {
-        anim.speed=0;
-        audioSource.Pause();
-             anim.SetBool("run",false);
-             anim.SetBool("shoot",false);
-             anim.SetBool("idle",false);
-            Invoke("Die",0);
-    }
-}
 }
