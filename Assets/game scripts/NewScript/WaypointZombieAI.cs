@@ -166,7 +166,16 @@ public class WaypointZombieAI : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetWaypoint.position) <= waypointReachDistance)
         {
-            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+            if (waypoints.Length <= 1) return;
+
+            int nextWaypointIndex;
+            do
+            {
+                nextWaypointIndex = Random.Range(0, waypoints.Length);
+            } 
+            while (nextWaypointIndex == currentWaypointIndex);
+
+            currentWaypointIndex = nextWaypointIndex;
         }
     }
 

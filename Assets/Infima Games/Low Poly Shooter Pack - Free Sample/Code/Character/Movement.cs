@@ -62,13 +62,12 @@ namespace InfimaGames.LowPolyShooterPack
         /// True if the character is currently grounded.
         /// </summary>
         private bool grounded;
-        public pause_menu_script pms;
-        private float d;
+        
         /// <summary>
         /// Player Character.
         /// </summary>
         private CharacterBehaviour playerCharacter;
-        // public Vector2 frameInput;
+        
         /// <summary>
         /// The player character's equipped weapon.
         /// </summary>
@@ -93,7 +92,7 @@ namespace InfimaGames.LowPolyShooterPack
         }
 
         /// Initializes the FpsController on start.
-        protected override  void Start()
+        protected override void Start()
         {
             //Rigidbody Setup.
             rigidBody = GetComponent<Rigidbody>();
@@ -110,7 +109,7 @@ namespace InfimaGames.LowPolyShooterPack
         /// Checks if the character is on the ground.
         private void OnCollisionStay()
         {
-            // //Bounds.
+            //Bounds.
             Bounds bounds = capsule.bounds;
             //Extents.
             Vector3 extents = bounds.extents;
@@ -129,34 +128,37 @@ namespace InfimaGames.LowPolyShooterPack
             for (var i = 0; i < groundHits.Length; i++)
                 groundHits[i] = new RaycastHit();
 
-            // //Set grounded. Now we know for sure that we're grounded.
+            //Set grounded. Now we know for sure that we're grounded.
             grounded = true;
         }
-			
+            
         protected override void FixedUpdate()
         {
+            // Nếu game đang pause (Time.timeScale bằng 0) thì không chạy logic di chuyển
+            if (Time.timeScale == 0f) return;
+
             //Move.
-            if(!pms.gamepaused){
             MoveCharacter();
             
             //Unground.
             grounded = false;
-            }
         }
 
         /// Moves the camera to the character, processes jumping and plays sounds every frame.
-        protected override  void Update()
+        protected override void Update()
         {
-            if(pms.gamepaused){
-            audioSource.Stop();
-        }
-            if(!pms.gamepaused){
+            if (Time.timeScale == 0f)
+            {
+                if (audioSource.isPlaying)
+                    audioSource.Stop();
+                return;
+            }
+
             //Get the equipped weapon!
             equippedWeapon = playerCharacter.GetInventory().GetEquipped();
             
             //Play Sounds!
             PlayFootstepSounds();
-            }
         }
 
         #endregion
@@ -165,41 +167,41 @@ namespace InfimaGames.LowPolyShooterPack
 
         private void MoveCharacter()
         {
+            if (Time.timeScale == 0f) return;
+
             #region Calculate Movement Velocity
-            if(!pms.gamepaused){
             //Get Movement Input!
             Vector2 frameInput = playerCharacter.GetInputMovement();
-                        
+                    
             //Calculate local-space direction by using the player's input.
             var movement = new Vector3(frameInput.x, 0.0f, frameInput.y);
             
             //Running speed calculation.
             if(playerCharacter.IsRunning()){
                 movement *= speedRunning;
-                // rigidBody.AddForce(0,5f,0,ForceMode.Impulse);
             }
             else
             {
                 //Multiply by the normal walking speed.
                 movement *= speedWalking;
             }
-                if(Input.GetKeyDown(KeyCode.Space) && grounded){
+
+            if(Input.GetKeyDown(KeyCode.Space) && grounded){
                 rigidBody.AddForce(0f, 300f, 0f, ForceMode.Impulse);
-                grounded=false;
+                grounded = false;
             }
+            
             //World space velocity calculation. This allows us to add it to the rigidbody's velocity properly.
             movement = transform.TransformDirection(movement);
 
             #endregion
+
             if(grounded){
                 Velocity = new Vector3(movement.x, 0.0f, movement.z);
-
             }
             else{
-            //Update Velocity.
-            Velocity = new Vector3(movement.x, -1f, movement.z);
-            // grounde
-            }
+                //Update Velocity.
+                Velocity = new Vector3(movement.x, -1f, movement.z);
             }
         }
 
@@ -208,7 +210,8 @@ namespace InfimaGames.LowPolyShooterPack
         /// </summary>
         private void PlayFootstepSounds()
         {
-            if(!pms.gamepaused){
+            if (Time.timeScale == 0f) return;
+
             //Check if we're moving on the ground. We don't need footsteps in the air.
             if (grounded && rigidBody.linearVelocity.sqrMagnitude > 0.1f)
             {
@@ -221,7 +224,6 @@ namespace InfimaGames.LowPolyShooterPack
             //Pause it if we're doing something like flying, or not moving!
             else if (audioSource.isPlaying)
                 audioSource.Pause();
-            }
         }
 
         #endregion
