@@ -78,4 +78,24 @@ public class ZombieWaveSystem : MonoBehaviour
 
         waveNumber++;
     }
+
+    public int GetTotalZombiesSpawned()
+    {
+        return totalZombiesSpawned;
+    }
+
+    public int GetWaveNumber()
+    {
+        return waveNumber;
+    }
+
+    public int GetMaxWaves()
+    {
+        return maxWaves;
+    }
+
+    public float GetTimeBetweenWaves()
+    {
+        return timeBetweenWaves;
+    }
 }

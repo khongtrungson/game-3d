@@ -26,6 +26,7 @@ TagManager:
   - medikit
   - Minimap
   - Waypoint
+  - Zombie
   layers:
   - Default
   - TransparentFX
