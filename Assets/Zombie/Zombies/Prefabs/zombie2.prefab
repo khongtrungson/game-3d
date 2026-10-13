@@ -643,21 +643,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaypointZombieAI
   navAgent: {fileID: 6483527273316422911}
-  player: {fileID: 0}
   animator: {fileID: 1214307863033127773}
   currentState: 1
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  waypointReachDistance: 1.5
+  waypoints: []
   patrolSpeed: 0.6
   chaseSpeed: 2
   chaseDistance: 10
   loseSightDistance: 15
   attackDistance: 2
   attackCooldown: 2
-  attackDelay: 1.5
   damage: 8
   health: 100
   bloodScreenEffectPrefab: {fileID: 8295454722715563050, guid: 5faa9531cee532545b368748f89c38ce, type: 3}

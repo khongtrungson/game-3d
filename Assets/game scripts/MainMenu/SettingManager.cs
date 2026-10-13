@@ -13,6 +13,8 @@ public class SettingManager : MonoBehaviour
     public Slider sensitivitySlider;
     [SerializeField] private float timeBetweenWaves;
     [SerializeField] private int zombiePerWave;
+    [SerializeField] private int maxWaves;
+    [SerializeField] private int totalZombiesSpawned = 0;
 
     [SerializeField] private float smoothSpeed;
     [SerializeField] private float sensitivity;
@@ -40,8 +42,9 @@ public class SettingManager : MonoBehaviour
         sensitivitySlider.minValue = 1f;
         sensitivitySlider.maxValue = 5f;
 
-        timeBetweenWaves = 10f;
-        zombiePerWave = 4;
+        timeBetweenWaves = 15f;
+        zombiePerWave = 5;
+        maxWaves = 7;
         smoothSpeed = 10f;
         sensitivity = 2f;
 
@@ -84,6 +87,16 @@ public class SettingManager : MonoBehaviour
             zombiePerWave = PlayerPrefs.GetInt("ZombiePerWave");
         }
 
+        if (PlayerPrefs.HasKey("MaxWaves"))
+        {
+            maxWaves = PlayerPrefs.GetInt("MaxWaves");
+        }
+
+        if (PlayerPrefs.HasKey("TotalZombiesSpawned"))
+        {
+            totalZombiesSpawned = PlayerPrefs.GetInt("TotalZombiesSpawned");
+        }
+
         if (PlayerPrefs.HasKey("SmoothSpeed"))
         {
             smoothSpeed = PlayerPrefs.GetFloat("SmoothSpeed");
@@ -118,6 +131,7 @@ public class SettingManager : MonoBehaviour
 
         PlayerPrefs.SetFloat("TimeBetweenWaves", timeBetweenWaves);
         PlayerPrefs.SetInt("ZombiePerWave", zombiePerWave);
+        PlayerPrefs.SetInt("MaxWaves", maxWaves);
         PlayerPrefs.SetFloat("SmoothSpeed", smoothSpeed);
         PlayerPrefs.SetFloat("Sensitivity", sensitivity);
 
@@ -133,14 +147,16 @@ public class SettingManager : MonoBehaviour
 
     private void SetNormalDifficulty()
     {
-        timeBetweenWaves = 10f;
-        zombiePerWave = 4;
+        timeBetweenWaves = 15f;
+        zombiePerWave = 5;
+        maxWaves = 7;
     }
 
     private void SetHardDifficulty()
     {
-        timeBetweenWaves = 7f; 
-        zombiePerWave = 8;    
+        timeBetweenWaves = 10f; 
+        zombiePerWave = 7;
+        maxWaves = 9;    
     }
 
     public void selectMap(string mapName)

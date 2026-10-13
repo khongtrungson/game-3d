@@ -25,6 +25,7 @@ TagManager:
   - enemy
   - medikit
   - Minimap
+  - Waypoint
   layers:
   - Default
   - TransparentFX

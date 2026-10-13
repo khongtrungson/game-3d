@@ -147,7 +147,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 0.7
+  m_Speed: 0.55
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -195,26 +195,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaypointZombieAI
   navAgent: {fileID: 4789655547567448000}
-  player: {fileID: 0}
   animator: {fileID: 5515928049880119018}
   currentState: 1
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  waypointReachDistance: 1.5
+  waypoints: []
   patrolSpeed: 0.65
   chaseSpeed: 3
   chaseDistance: 10
   loseSightDistance: 15
   attackDistance: 2.5
   attackCooldown: 2
-  attackDelay: 1.5
   damage: 10
   health: 100
   bloodScreenEffectPrefab: {fileID: 8295454722715563050, guid: 5faa9531cee532545b368748f89c38ce, type: 3}
