@@ -48,14 +48,6 @@ public class Enemy_health : MonoBehaviour
         enemy_hurt = Resources.Load<AudioClip>("enemy_hurt");
 
         Transform own = transform;
-        if (own.GetComponent<soldier_enemyController>() == null)
-        {
-            enemy_dying = Resources.Load<AudioClip>("zombie_dying");
-        }
-        else
-        {
-            enemy_dying = Resources.Load<AudioClip>("enemy_dying");
-        }
     }
 
     void Update()

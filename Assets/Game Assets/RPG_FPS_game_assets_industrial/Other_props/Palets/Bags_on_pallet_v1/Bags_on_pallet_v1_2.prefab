@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 33000014275677598}
   - component: {fileID: 23000012562995738}
   - component: {fileID: 65000013549923008}
+  - component: {fileID: -4825980415691412880}
   m_Layer: 0
   m_Name: Bags_on_pallet_v1_2
   m_TagString: Untagged
@@ -112,3 +113,28 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.497716, y: 2.5346951, z: 1.6031151}
   m_Center: {x: 0.00000047683716, y: 1.2653632, z: -0.0000019073486}
+--- !u!205 &-4825980415691412880
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000011569870456}
+  serializedVersion: 3
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.6
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.3
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.1
+    fadeTransitionWidth: 0
+    renderers: []
+  m_Enabled: 1
+  m_GlobalIlluminationLOD: 0

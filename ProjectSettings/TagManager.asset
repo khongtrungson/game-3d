@@ -24,6 +24,7 @@ TagManager:
   - ExplosiveBarrel
   - enemy
   - medikit
+  - Minimap
   layers:
   - Default
   - TransparentFX
@@ -31,8 +32,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - MinimapIcon
+  - FistPersonView
   - 
   - 
   - 

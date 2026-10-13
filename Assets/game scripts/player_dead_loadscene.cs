@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class player_dead_loadscene : MonoBehaviour
 {
@@ -11,45 +10,56 @@ public class player_dead_loadscene : MonoBehaviour
     public player_health ph;
     
     [Header("Death Screen Reference")]
-    public DeathScreen deathScreen; // Kéo thả đối tượng DeathScreen vào đây
+    public DeathScreenUI deathScreen; // Kéo thả đối tượng DeathScreen vào đây
 
+    [Header("UI Elements to Hide on Death")]
+    public GameObject playerHealthBar; // Kéo thả đối tượng player_health_bar vào đây
+    public GameObject pLpspUiCanvas;   // Kéo thả đối tượng P_LPSP_UI_Canvas vào đây
+
+    [Header("Player Object")]
+    public GameObject playerObject;    // Kéo nhân vật (Player) của bạn vào đây (chỉ 1 ô duy nhất này thôi)
+  
     void Update()
     {
         time_finish = GameObject.FindGameObjectWithTag("time_finish");
         enemy_finish = GameObject.FindGameObjectWithTag("enemy_finish");
 
-        if (ph.player_dead == true && time_finish == null && enemy_finish == null)
+        // Khi người chơi chết hoặc hết giờ mà chưa diệt hết quái -> Game Over
+        if ((ph.player_dead == true && time_finish == null && enemy_finish == null) ||
+            (ph.player_dead == false && time_finish != null && enemy_finish == null))
         { 
             TriggerGameOver();
-        }
-        else if (ph.player_dead == false && time_finish == null && enemy_finish != null)
-        {
-            Invoke("load_scene", 10);
-        }
-        else if (ph.player_dead == false && time_finish != null && enemy_finish == null)
-        {
-            TriggerGameOver();
-        }
-        else if (ph.player_dead == false && time_finish != null && enemy_finish != null)
-        {
-            Invoke("load_scene", 10);
         }
     }
 
     private void TriggerGameOver()
     {
+        // 1. Hiển thị bảng DeathScreen
         if (deathScreen != null)
         {
             deathScreen.showDeadScreen = true;
         }
 
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-    }
+        // 2. Tắt thanh máu và toàn bộ canvas giao diện
+        if (playerHealthBar != null) playerHealthBar.SetActive(false);
+        if (pLpspUiCanvas != null) pLpspUiCanvas.SetActive(false);
 
-    private void load_scene()
-    {
-        SceneManager.LoadScene("won scene 1");
+        // 3. Tự động vô hiệu hóa tất cả các script nằm trên Player (di chuyển, bắn súng, lựu đạn...)
+        if (playerObject != null)
+        {
+            // Lấy tất cả các script đang gắn trên người Player và tắt chúng đi
+            MonoBehaviour[] scripts = playerObject.GetComponentsInChildren<MonoBehaviour>();
+            foreach (MonoBehaviour script in scripts)
+            {
+                // Không tự tắt script quản lý chết này
+                if (script != this)
+                {
+                    script.enabled = false;
+                }
+            }
+        }
+
+        // 4. Mở khóa con trỏ chuột
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }

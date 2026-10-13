@@ -22,7 +22,7 @@ public class target_player : MonoBehaviour
     }
 
     void Update()
-    {   
+    {  
         if (gun_big != null && gun_big.activeSelf) {
             range = 18f;
         }
@@ -57,23 +57,6 @@ public class target_player : MonoBehaviour
                 }
                 else {
                     health_script.TakeDamage(damage);
-                }
-            }
-            // 2. Kẻ địch Bay
-            else {
-                fly_enemy_health_script fly_health_script = hit.transform.GetComponent<fly_enemy_health_script>();
-                if (fly_health_script != null) {
-                    fly_health_script.enemy_hurting = true;
-
-                    // Bắn hiệu ứng máu cho quái bay
-                    SpawnBloodEffect(hit.point, hit.normal);
-
-                    if (hit.collider == fly_health_script.eye_collider) {
-                        fly_health_script.TakeDamage(80);
-                    }
-                    else {
-                        fly_health_script.TakeDamage(damage);
-                    }
                 }
             }
 

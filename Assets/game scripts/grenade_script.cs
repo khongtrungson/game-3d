@@ -45,16 +45,12 @@ public class grenade_script : MonoBehaviour
             // }
 
             Enemy_health health1=nearby.GetComponent<Enemy_health>();
-            fly_enemy_health_script health2=nearby.GetComponent<fly_enemy_health_script>();
             player_health health3=nearby.GetComponent<player_health>();
             explosion_barrel exp1=nearby.GetComponent<explosion_barrel>();
             if(health1!=null){
                 health1.TakeDamage(150f);
             }
-             if(health2!=null){
-                health2.TakeDamage(100f);
-            }
-             if(exp1!=null){
+            if(exp1!=null){
                 exp1.barrel_health=0f;
                 exp1.TakeDamage();
             }

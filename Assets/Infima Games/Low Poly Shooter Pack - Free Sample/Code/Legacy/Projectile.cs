@@ -122,20 +122,20 @@ public class Projectile : MonoBehaviour {
 			
 		//If bullet collides with "ExplosiveBarrel" tag
 		if (collision != null && collision.transform.CompareTag("ExplosiveBarrel")) 
-{
-    // Kiểm tra xem vật thể va chạm có chứa script ExplosiveBarrelScript hay không
-    if (collision.gameObject.TryGetComponent<ExplosiveBarrelScript>(out var barrel))
-    {
-        barrel.explode = true;
-    }
-    else
-    {
-        Debug.LogWarning($"Vật thể {collision.gameObject.name} có tag 'ExplosiveBarrel' nhưng thiếu ExplosiveBarrelScript!");
-    }
+		{
+			// Kiểm tra xem vật thể va chạm có chứa script ExplosiveBarrelScript hay không
+			if (collision.gameObject.TryGetComponent<ExplosiveBarrelScript>(out var barrel))
+			{
+				barrel.explode = true;
+			}
+			else
+			{
+				Debug.LogWarning($"Vật thể {collision.gameObject.name} có tag 'ExplosiveBarrel' nhưng thiếu ExplosiveBarrelScript!");
+			}
 
-    // Tiêu hủy viên đạn
-    Destroy(gameObject);
-}
+			// Tiêu hủy viên đạn
+			Destroy(gameObject);
+		}
 
 		//If bullet collides with "GasTank" tag
 		if (collision.transform.tag == "GasTank") 

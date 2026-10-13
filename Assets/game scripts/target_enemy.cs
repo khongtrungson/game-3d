@@ -25,12 +25,6 @@ public class target_enemy : MonoBehaviour
             shoot();
         }
         }
-        else{
-             fly_enemy_health_script fly_health_script=GetComponent<fly_enemy_health_script>();
-                if(player!=null && fly_health_script.health>0){
-                    shoot();
-        }
-        }
     }
     private void shoot(){
         RaycastHit hit;

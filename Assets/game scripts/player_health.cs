@@ -11,7 +11,7 @@ public class player_health : MonoBehaviour
 
     [Header("UI Settings")]
     public health_bar_script hbs;
-    public DeathScreen deathScreen; // Tham chiếu đến script DeathScreen để hiển thị màn hình chết
+    public DeathScreenUI deathScreen; // Tham chiếu đến script DeathScreen để hiển thị màn hình chết
 
     [Header("Audio Settings")]
     public AudioSource audioSource;

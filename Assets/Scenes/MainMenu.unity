@@ -173,7 +173,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &106575754
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1037,7 +1037,7 @@ RectTransform:
   m_Father: {fileID: 1124831887}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -2.5, y: 0}
   m_SizeDelta: {x: 4.9999, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2125,7 +2125,12 @@ MonoBehaviour:
   mainCanvas: {fileID: 2058048644}
   loadingSlider: {fileID: 849547847}
   fillTime: 1
---- !u!114 &1692775659
+--- !u!4 &1692775660 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 355529388823523236, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
+  m_PrefabInstance: {fileID: 351642386607453115}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1692775661
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2134,9 +2139,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1692775656}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef46aa75c1684df4aa791faaff261eaa, type: 3}
+  m_Script: {fileID: 11500000, guid: a20e5926b44187d4aa6a61db166d350c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SettingsManager
+  m_EditorClassIdentifier: Assembly-CSharp::SettingManager
   normalDifficultyButton: {fileID: 1939342589}
   hardDifficultyButton: {fileID: 351642386607453116}
   saveButton: {fileID: 655856465}
@@ -2150,15 +2155,10 @@ MonoBehaviour:
   map2Button: {fileID: 357741689}
   continueButton: {fileID: 1588385799}
   selectedMap: 
-  inGameLoadingCanvas: {fileID: 106575753}
-  loadingSlider: {fileID: 425347535}
+  inGameLoadingCanvas: {fileID: 1470616155}
+  loadingSlider: {fileID: 849547847}
   sfxVolumeSlider: {fileID: 825334900}
   audioMixer: {fileID: 24100000, guid: aa3afa49d22cb45438c8a86757d8b5d6, type: 2}
---- !u!4 &1692775660 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 355529388823523236, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
-  m_PrefabInstance: {fileID: 351642386607453115}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1873340006
 GameObject:
   m_ObjectHideFlags: 0
@@ -3602,10 +3602,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 352915704992195996, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1692775659}
+      addedObject: {fileID: 1692775658}
     - targetCorrespondingSourceObject: {fileID: 352915704992195996, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1692775658}
+      addedObject: {fileID: 1692775661}
     - targetCorrespondingSourceObject: {fileID: 352696004450694496, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
       insertIndex: -1
       addedObject: {fileID: 351642386607453132}
