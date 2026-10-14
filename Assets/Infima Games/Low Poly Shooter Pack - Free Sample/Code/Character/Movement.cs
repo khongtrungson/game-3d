@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using System.Linq;
 using UnityEngine;
@@ -28,16 +28,20 @@ namespace InfimaGames.LowPolyShooterPack
         [Tooltip("How fast the player moves while running."), SerializeField]
         private float speedRunning = 9.0f;
 
+        [Tooltip("Lực nhảy của nhân vật"), SerializeField]
+        private float jumpForce = 25f;
+
+        [Header("Mobile Joystick Reference")]
+        [SerializeField]
+        private Joystick mobileJoystick;
+
         #endregion
 
         #region PROPERTIES
 
-        //Velocity.
         private Vector3 Velocity
         {
-            //Getter.
             get => rigidBody.linearVelocity;
-            //Setter.
             set => rigidBody.linearVelocity = value;
         }
 
@@ -45,119 +49,73 @@ namespace InfimaGames.LowPolyShooterPack
 
         #region FIELDS
 
-        /// <summary>
-        /// Attached Rigidbody.
-        /// </summary>
         private Rigidbody rigidBody;
-        /// <summary>
-        /// Attached CapsuleCollider.
-        /// </summary>
         private CapsuleCollider capsule;
-        /// <summary>
-        /// Attached AudioSource.
-        /// </summary>
         private AudioSource audioSource;
         
-        /// <summary>
-        /// True if the character is currently grounded.
-        /// </summary>
         private bool grounded;
-        
-        /// <summary>
-        /// Player Character.
-        /// </summary>
         private CharacterBehaviour playerCharacter;
-        
-        /// <summary>
-        /// The player character's equipped weapon.
-        /// </summary>
         private WeaponBehaviour equippedWeapon;
         
-        /// <summary>
-        /// Array of RaycastHits used for ground checking.
-        /// </summary>
         private readonly RaycastHit[] groundHits = new RaycastHit[8];
 
         #endregion
 
         #region UNITY FUNCTIONS
 
-        /// <summary>
-        /// Awake.
-        /// </summary>
         protected override void Awake()
         {
-            //Get Player Character.
             playerCharacter = ServiceLocator.Current.Get<IGameModeService>().GetPlayerCharacter();
         }
 
-        /// Initializes the FpsController on start.
         protected override void Start()
         {
-            //Rigidbody Setup.
             rigidBody = GetComponent<Rigidbody>();
             rigidBody.constraints = RigidbodyConstraints.FreezeRotation;
-            //Cache the CapsuleCollider.
             capsule = GetComponent<CapsuleCollider>();
 
-            //Audio Source Setup.
             audioSource = GetComponent<AudioSource>();
             audioSource.clip = audioClipWalking;
             audioSource.loop = true;
+
+            // Tự động tìm joystick trong scene nếu chưa kéo thả vào Inspector
+            if (mobileJoystick == null)
+            {
+                mobileJoystick = FindObjectOfType<Joystick>();
+            }
         }
 
-        /// Checks if the character is on the ground.
         private void OnCollisionStay()
         {
-            //Bounds.
             Bounds bounds = capsule.bounds;
-            //Extents.
             Vector3 extents = bounds.extents;
-            //Radius.
             float radius = extents.x - 0.01f;
             
-            //Cast. This checks whether there is indeed ground, or not.
             Physics.SphereCastNonAlloc(bounds.center, radius, Vector3.down,
                 groundHits, extents.y - radius * 0.5f, ~0, QueryTriggerInteraction.Ignore);
             
-            //We can ignore the rest if we don't have any proper hits.
             if (!groundHits.Any(hit => hit.collider != null && hit.collider != capsule)) 
                 return;
             
-            //Store RaycastHits.
             for (var i = 0; i < groundHits.Length; i++)
                 groundHits[i] = new RaycastHit();
 
-            //Set grounded. Now we know for sure that we're grounded.
             grounded = true;
         }
             
         protected override void FixedUpdate()
         {
-            // Nếu game đang pause (Time.timeScale bằng 0) thì không chạy logic di chuyển
-            if (Time.timeScale == 0f) return;
-
-            //Move.
             MoveCharacter();
-            
-            //Unground.
             grounded = false;
         }
 
-        /// Moves the camera to the character, processes jumping and plays sounds every frame.
         protected override void Update()
         {
-            if (Time.timeScale == 0f)
+            if (playerCharacter != null && playerCharacter.GetInventory() != null)
             {
-                if (audioSource.isPlaying)
-                    audioSource.Stop();
-                return;
+                equippedWeapon = playerCharacter.GetInventory().GetEquipped();
             }
-
-            //Get the equipped weapon!
-            equippedWeapon = playerCharacter.GetInventory().GetEquipped();
             
-            //Play Sounds!
             PlayFootstepSounds();
         }
 
@@ -167,63 +125,106 @@ namespace InfimaGames.LowPolyShooterPack
 
         private void MoveCharacter()
         {
-            if (Time.timeScale == 0f) return;
-
             #region Calculate Movement Velocity
-            //Get Movement Input!
-            Vector2 frameInput = playerCharacter.GetInputMovement();
-                    
-            //Calculate local-space direction by using the player's input.
-            var movement = new Vector3(frameInput.x, 0.0f, frameInput.y);
-            
-            //Running speed calculation.
-            if(playerCharacter.IsRunning()){
-                movement *= speedRunning;
+
+            // 1. Lấy input từ joystick Android
+            Vector2 frameInput = Vector2.zero;
+            bool usingJoystick = false;
+
+            if (mobileJoystick != null && mobileJoystick.Direction.sqrMagnitude > 0.001f)
+            {
+                frameInput = mobileJoystick.Direction;
+                usingJoystick = true;
+            }
+
+            // 2. Nếu không sử dụng joystick thì lấy input bàn phím gốc (PC)
+            if (!usingJoystick)
+            {
+                frameInput = playerCharacter.GetInputMovement();
+            }
+
+            // 3. Giới hạn input tối đa để tránh tăng tốc thô bạo khi di chuyển chéo
+            frameInput = Vector2.ClampMagnitude(frameInput, 1f);
+
+            // 4. Xác định đi bộ hoặc chạy
+            bool isRunning;
+
+            if (usingJoystick)
+            {
+                isRunning = frameInput.sqrMagnitude >= 0.6f * 0.6f;
             }
             else
             {
-                //Multiply by the normal walking speed.
-                movement *= speedWalking;
+                isRunning = playerCharacter.IsRunning();
             }
 
-            if(Input.GetKeyDown(KeyCode.Space) && grounded){
-                rigidBody.AddForce(0f, 300f, 0f, ForceMode.Impulse);
-                grounded = false;
+            // 5. Tính tốc độ di chuyển cơ bản và tỉ lệ độ lớn lực đẩy joystick
+            float moveSpeed = isRunning ? speedRunning : speedWalking;
+            float inputMagnitude = usingJoystick ? frameInput.magnitude : 1f;
+
+            Vector3 movement = new Vector3(
+                frameInput.x,
+                0f,
+                frameInput.y
+            );
+
+            movement *= moveSpeed * inputMagnitude;
+
+            // 6. Tạo độ rung lắc nhẹ (bobbing) mô phỏng bước chân cho Joystick
+            if (grounded && usingJoystick && frameInput.sqrMagnitude > 0.01f)
+            {
+                float bobFrequency = isRunning ? 60f : 10f;
+                float bobAmplitude = isRunning ? 0.2f : 0.02f;
+                
+                float waveSlice = Mathf.Sin(Time.time * bobFrequency);
+                movement.z += waveSlice * bobAmplitude * speedWalking;
             }
-            
-            //World space velocity calculation. This allows us to add it to the rigidbody's velocity properly.
+
+            // 7. Chuyển hướng di chuyển sang tọa độ thế giới
             movement = transform.TransformDirection(movement);
+
+            // 8. Nhảy bằng phím Space trên PC hoặc nút ảo Mobile
+            if (Input.GetKeyDown(KeyCode.Space) && grounded)
+            {
+                MobileJump();
+            }
 
             #endregion
 
-            if(grounded){
-                Velocity = new Vector3(movement.x, 0.0f, movement.z);
+            // 9. Cập nhật vận tốc cho Rigidbody
+            if (grounded)
+            {
+                Velocity = new Vector3(movement.x, 0f, movement.z);
             }
-            else{
-                //Update Velocity.
-                Velocity = new Vector3(movement.x, -1f, movement.z);
+            else
+            {
+                // Giữ lại vận tốc theo trục Y khi đang nhảy hoặc rơi tự do
+                Velocity = new Vector3(movement.x, rigidBody.linearVelocity.y, movement.z);
             }
         }
 
-        /// <summary>
-        /// Plays Footstep Sounds. This code is slightly old, so may not be great, but it functions alright-y!
-        /// </summary>
+        // 10. Hàm nhảy dành cho nút bấm ảo trên Android (Gắn vào sự kiện OnClick của UI Button)
+        public void MobileJump()
+        {
+            if (!grounded)
+                return;
+
+            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            grounded = false;
+        }
+
         private void PlayFootstepSounds()
         {
-            if (Time.timeScale == 0f) return;
-
-            //Check if we're moving on the ground. We don't need footsteps in the air.
             if (grounded && rigidBody.linearVelocity.sqrMagnitude > 0.1f)
             {
-                //Select the correct audio clip to play.
                 audioSource.clip = playerCharacter.IsRunning() ? audioClipRunning : audioClipWalking;
-                //Play it!
                 if (!audioSource.isPlaying)
                     audioSource.Play();
             }
-            //Pause it if we're doing something like flying, or not moving!
             else if (audioSource.isPlaying)
+            {
                 audioSource.Pause();
+            }
         }
 
         #endregion

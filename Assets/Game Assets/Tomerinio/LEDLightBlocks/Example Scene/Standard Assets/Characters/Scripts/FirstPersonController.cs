@@ -162,29 +162,32 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void GetInput(out float speed)
         {
-            // Read input
+            // Đọc input từ bàn phím hoặc Joystick (CrossPlatformInputManager sẽ tự xử lý)
             float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
 
             bool waswalking = m_IsWalking;
 
-#if !MOBILE_INPUT
-            // On standalone builds, walk/run speed is modified by a key press.
-            // keep track of whether or not the character is walking or running
+        #if !MOBILE_INPUT
+            // Trên PC: Chuyển đổi đi/chạy bằng phím Left Shift
             m_IsWalking = !Input.GetKey(KeyCode.LeftShift);
-#endif
-            // set the desired speed to be walking or running
+        #else
+            // Trên Mobile: Bạn có thể tự định nghĩa logic chạy ở đây 
+            // Hoặc nếu dùng Joystick, kéo nhẹ là đi, kéo hết cỡ là chạy:
+            // m_IsWalking = (new Vector2(horizontal, vertical)).sqrMagnitude < 0.5f;
+        #endif
+
+            // Thiết lập tốc độ dựa trên trạng thái đi hoặc chạy
             speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
             m_Input = new Vector2(horizontal, vertical);
 
-            // normalize input if it exceeds 1 in combined length:
+            // Chuẩn hóa input nếu độ dài vượt quá 1 (tránh di chuyển chéo quá nhanh)
             if (m_Input.sqrMagnitude > 1)
             {
                 m_Input.Normalize();
             }
 
-            // handle speed change to give an fov kick
-            // only if the player is going to a run, is running and the fovkick is to be used
+            // Hiệu ứng thay đổi FOV khi thay đổi tốc độ
             if (m_IsWalking != waswalking && m_UseFovKick && m_CharacterController.velocity.sqrMagnitude > 0)
             {
                 StopAllCoroutines();

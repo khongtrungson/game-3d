@@ -2124,7 +2124,7 @@ MonoBehaviour:
   loadingCanvas: {fileID: 1470616155}
   mainCanvas: {fileID: 2058048644}
   loadingSlider: {fileID: 849547847}
-  fillTime: 1
+  fillTime: 3
 --- !u!4 &1692775660 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 355529388823523236, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
@@ -2149,6 +2149,8 @@ MonoBehaviour:
   sensitivitySlider: {fileID: 1287633680}
   timeBetweenWaves: 0
   zombiePerWave: 0
+  maxWaves: 0
+  totalZombiesSpawned: 0
   smoothSpeed: 0
   sensitivity: 0
   map1Button: {fileID: 869630117}

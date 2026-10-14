@@ -25,25 +25,49 @@ public class can_throw_grenade : MonoBehaviour
         }
 
 
-        bullet_kit= GameObject.FindGameObjectsWithTag("bullet_kit");
-			foreach(var kit in bullet_kit){
-				float dis = Vector3.Distance(player.transform.position,kit.transform.position);
-				if(dis<2.5f && Input.GetKeyDown(KeyCode.R)){
-                    grenade_present= GameObject.FindGameObjectsWithTag("grenade");
-                    foreach(var gre in grenade_present){
-                        Destroy(gre);
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RefillGrenades();
+        }
+    }
+
+    /// <summary>
+    /// Nạp đầy 8 quả lựu đạn khi người chơi đứng gần hộp tiếp tế bullet_kit (khoảng cách < 2.5m)
+    /// </summary>
+    public void RefillGrenades()
+    {
+        if (player == null) player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        bullet_kit = GameObject.FindGameObjectsWithTag("bullet_kit");
+        if (bullet_kit == null) return;
+
+        foreach (var kit in bullet_kit)
+        {
+            if (kit == null) continue;
+            float dis = Vector3.Distance(player.transform.position, kit.transform.position);
+            if (dis < 2.5f)
+            {
+                grenade_present = GameObject.FindGameObjectsWithTag("grenade");
+                if (grenade_present != null)
+                {
+                    foreach (var gre in grenade_present)
+                    {
+                        if (gre != null) Destroy(gre);
                     }
-                Instantiate(Resources.Load("grenade_checking") as GameObject);
-                 Instantiate(Resources.Load("grenade_checking") as GameObject);
-                  Instantiate(Resources.Load("grenade_checking") as GameObject);
-                   Instantiate(Resources.Load("grenade_checking") as GameObject);
-                    Instantiate(Resources.Load("grenade_checking") as GameObject);
-                     Instantiate(Resources.Load("grenade_checking") as GameObject);
-                 Instantiate(Resources.Load("grenade_checking") as GameObject);
-                  Instantiate(Resources.Load("grenade_checking") as GameObject);
-				}
-			}
-        
+                }
+
+                var prefab = Resources.Load("grenade_checking") as GameObject;
+                if (prefab != null)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        Instantiate(prefab);
+                    }
+                }
+                break;
+            }
+        }
     }
     public void destro_one(){
         grenade_present= GameObject.FindGameObjectsWithTag("grenade");

@@ -40,9 +40,10 @@ public class player_dead_loadscene : MonoBehaviour
             deathScreen.showDeadScreen = true;
         }
 
-        // 2. Tắt thanh máu và toàn bộ canvas giao diện
+        // 2. Tắt thanh máu và toàn bộ canvas giao diện (bao gồm MobileButton, P_LPSP_UI_Canvas, Minimap...)
         if (playerHealthBar != null) playerHealthBar.SetActive(false);
         if (pLpspUiCanvas != null) pLpspUiCanvas.SetActive(false);
+        HideAllGameplayHUDs(deathScreen != null ? deathScreen.gameObject : null);
 
         // 3. Tự động vô hiệu hóa tất cả các script nằm trên Player (di chuyển, bắn súng, lựu đạn...)
         if (playerObject != null)
@@ -62,5 +63,62 @@ public class player_dead_loadscene : MonoBehaviour
         // 4. Mở khóa con trỏ chuột
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+    }
+
+    /// <summary>
+    /// Ẩn toàn bộ các UI Canvas và HUD điều khiển gameplay (MobileButton, P_LPSP_UI_Canvas, minimap...)
+    /// ngoại trừ màn hình hiển thị được chỉ định (như DeathScreen hoặc WinCanvas).
+    /// </summary>
+    public static void HideAllGameplayHUDs(GameObject screenToKeep = null)
+    {
+        // 1. Tắt MobileButton
+        var mobileInput = Object.FindAnyObjectByType<MobileInputController>();
+        if (mobileInput != null && (screenToKeep == null || !mobileInput.transform.IsChildOf(screenToKeep.transform)))
+        {
+            mobileInput.gameObject.SetActive(false);
+        }
+        GameObject mobileBtnObj = GameObject.Find("MobileButton");
+        if (mobileBtnObj != null && mobileBtnObj != screenToKeep)
+        {
+            mobileBtnObj.SetActive(false);
+        }
+
+        // 2. Tắt P_LPSP_UI_Canvas
+        GameObject plpspCanvas = GameObject.Find("P_LPSP_UI_Canvas");
+        if (plpspCanvas != null && plpspCanvas != screenToKeep)
+        {
+            plpspCanvas.SetActive(false);
+        }
+
+        // 3. Tắt thanh máu
+        GameObject healthBar = GameObject.Find("player_health_bar");
+        if (healthBar != null && healthBar != screenToKeep)
+        {
+            healthBar.SetActive(false);
+        }
+
+        // 4. Tắt ZoomMiniMap
+        GameObject miniMap = GameObject.Find("ZoomMiniMap");
+        if (miniMap != null && miniMap != screenToKeep)
+        {
+            miniMap.SetActive(false);
+        }
+
+        // 5. Quét tất cả các canvas con trong Main Canvas hoặc toàn Scene
+        Canvas[] allCanvases = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+        foreach (var c in allCanvases)
+        {
+            if (c == null) continue;
+            if (screenToKeep != null && (c.gameObject == screenToKeep || c.transform.IsChildOf(screenToKeep.transform) || screenToKeep.transform.IsChildOf(c.transform)))
+            {
+                continue;
+            }
+
+            // Nếu canvas này là canvas riêng của HUD thì tắt đi
+            if (c.name.Contains("Mobile") || c.name.Contains("LPSP") || c.name.Contains("HUD") || c.name.Contains("MiniMap"))
+            {
+                c.gameObject.SetActive(false);
+            }
+        }
     }
 }

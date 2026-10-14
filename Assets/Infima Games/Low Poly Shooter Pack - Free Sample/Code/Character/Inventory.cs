@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using UnityEngine;
 
@@ -31,9 +31,20 @@ namespace InfimaGames.LowPolyShooterPack
             //Cache all weapons. Beware that weapons need to be parented to the object this component is on!
             weapons = GetComponentsInChildren<WeaponBehaviour>(true);
             
-            //Disable all weapons. This makes it easier for us to only activate the one we need.
-            foreach (WeaponBehaviour weapon in weapons)
-                weapon.gameObject.SetActive(false);
+            //Pre-initialize each weapon so all magazines and initial ammo are cached immediately
+            if (weapons != null)
+            {
+                foreach (WeaponBehaviour weapon in weapons)
+                {
+                    if (weapon != null)
+                    {
+                        weapon.gameObject.SetActive(true);
+                        weapon.GetAmmunitionTotal();
+                        weapon.GetAmmunitionCurrent();
+                        weapon.gameObject.SetActive(false);
+                    }
+                }
+            }
 
             //Equip.
             Equip(equippedAtStart);
@@ -96,6 +107,25 @@ namespace InfimaGames.LowPolyShooterPack
 
         public override WeaponBehaviour GetEquipped() => equipped;
         public override int GetEquippedIndex() => equippedIndex;
+
+        public override WeaponBehaviour GetWeapon(int index)
+        {
+            if (weapons == null && transform != null)
+                weapons = GetComponentsInChildren<WeaponBehaviour>(true);
+
+            if (weapons == null || index < 0 || index >= weapons.Length)
+                return null;
+
+            return weapons[index];
+        }
+
+        public override int GetWeaponCount()
+        {
+            if (weapons == null && transform != null)
+                weapons = GetComponentsInChildren<WeaponBehaviour>(true);
+
+            return weapons != null ? weapons.Length : 0;
+        }
 
         #endregion
     }

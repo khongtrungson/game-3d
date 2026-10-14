@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using UnityEngine;
 using System.Globalization;
@@ -35,6 +35,9 @@ namespace InfimaGames.LowPolyShooterPack.Interface
         /// </summary>
         protected override void Tick()
         {
+            if (equippedWeapon == null)
+                return;
+
             //Current Ammunition.
             float current = equippedWeapon.GetAmmunitionCurrent();
             //Total Ammunition.
@@ -47,7 +50,7 @@ namespace InfimaGames.LowPolyShooterPack.Interface
             if (updateColor)
             {
                 //Calculate Color Alpha. Helpful to make the text color change based on count.
-                float colorAlpha = (current / total) * emptySpeed;
+                float colorAlpha = total > 0f ? (current / total) * emptySpeed : 0f;
                 //Lerp Color. This makes sure that the text color changes based on count.
                 textMesh.color = Color.Lerp(emptyColor, Color.white, colorAlpha);   
             }

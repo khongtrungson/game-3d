@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using System;
 using UnityEngine;
@@ -123,6 +123,10 @@ namespace InfimaGames.LowPolyShooterPack
         /// </summary>
         private Vector2 axisLook;
         /// <summary>
+        /// Giá trị xoay camera từ cảm ứng vuốt màn hình mobile.
+        /// </summary>
+        private Vector2 mobileLookDelta;
+        /// <summary>
         /// Look Axis Values.
         /// </summary>
         private Vector2 axisMovement;
@@ -153,6 +157,7 @@ namespace InfimaGames.LowPolyShooterPack
         private Transform player;
         private GameObject[] bullet_kit;
         private bool reloading_range=false;
+        private target_player targetPlayer;
 
         #endregion
 
@@ -220,12 +225,17 @@ namespace InfimaGames.LowPolyShooterPack
                 {
                     //Has fire rate passed.
                     if (Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire())
+                    {
                         Fire();
-                        if(checking==null){
-                        Instantiate(Resources.Load("checking") as GameObject);
+                        if (checking == null)
+                        {
+                            var checkingPrefab = Resources.Load("checking") as GameObject;
+                            if (checkingPrefab != null) Instantiate(checkingPrefab);
                         }
+                    }
                 }   
-                else{
+                else if (checking != null)
+                {
                     Destroy(checking);
                 }
             }
@@ -266,12 +276,29 @@ namespace InfimaGames.LowPolyShooterPack
         public override bool IsRunning() => running;
         
         public override bool IsAiming() => aiming;
-        public override bool IsCursorLocked() => cursorLocked;
+        public override bool IsCursorLocked() => (mobileLookDelta != Vector2.zero) || cursorLocked;
         
         public override bool IsTutorialTextVisible() => tutorialTextVisible;
         
         public override Vector2 GetInputMovement() => axisMovement;
-        public override Vector2 GetInputLook() => axisLook;
+        public override Vector2 GetInputLook()
+        {
+            if (mobileLookDelta != Vector2.zero)
+            {
+                Vector2 look = mobileLookDelta;
+                mobileLookDelta = Vector2.zero;
+                return look;
+            }
+            return axisLook;
+        }
+
+        /// <summary>
+        /// Cộng thêm delta xoay camera từ cảm ứng vuốt màn hình mobile.
+        /// </summary>
+        public void AddMobileLookDelta(Vector2 delta)
+        {
+            mobileLookDelta += delta;
+        }
 
         #endregion
 
@@ -321,6 +348,16 @@ namespace InfimaGames.LowPolyShooterPack
             //Play firing animation.
             const string stateName = "Fire";
             characterAnimator.CrossFade(stateName, 0.05f, layerOverlay, 0);
+
+            // Gây sát thương đạn và hiệu ứng máu lên zombie qua target_player
+            if (targetPlayer == null)
+            {
+                targetPlayer = GetComponent<target_player>();
+            }
+            if (targetPlayer != null)
+            {
+                targetPlayer.shoot();
+            }
         }
 
         private void PlayReloadAnimation()
@@ -681,9 +718,17 @@ namespace InfimaGames.LowPolyShooterPack
         }
         
         public void OnMove(InputAction.CallbackContext context)
-        {
-            axisMovement = (cursorLocked && Time.timeScale > 0f) ? context.ReadValue<Vector2>() : default;
-        }
+{
+    // Cho phép nhận input từ Joystick/Mobile ngay cả khi con trỏ chuột không bị khóa
+    if (Time.timeScale > 0f)
+    {
+        axisMovement = context.ReadValue<Vector2>();
+    }
+    else
+    {
+        axisMovement = default;
+    }
+}
 
         public void OnLook(InputAction.CallbackContext context)
         {
@@ -740,6 +785,222 @@ namespace InfimaGames.LowPolyShooterPack
         {
             holstering = false;
         }
+
+        #endregion
+
+        #region MOBILE CONTROLS
+
+        /// <summary>
+        /// Xử lý bắn cho nút bắn ảo trên Mobile (Hỗ trợ chạm bắn phát một và giữ nút bắn liên thanh).
+        /// </summary>
+        public void MobileShoot(bool isHolding)
+        {
+            if (Time.timeScale == 0f || equippedWeapon == null)
+                return;
+
+            holdingButtonFire = isHolding;
+
+            if (isHolding)
+            {
+                if (!CanPlayAnimationFire())
+                    return;
+
+                if (equippedWeapon.HasAmmunition())
+                {
+                    // Bắn ngay nếu là phát đầu tiên hoặc súng bán tự động và đã hết cooldown tốc độ bắn
+                    if (Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire())
+                    {
+                        Fire();
+                        if (checking == null)
+                        {
+                            var checkingPrefab = Resources.Load("checking") as GameObject;
+                            if (checkingPrefab != null) Instantiate(checkingPrefab);
+                        }
+                    }
+                }
+                else
+                {
+                    FireEmpty();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Bắn 1 viên đơn lẻ (tap nút bắn trên mobile).
+        /// </summary>
+        public void MobileSingleShoot()
+        {
+            if (Time.timeScale == 0f || equippedWeapon == null)
+                return;
+
+            if (!CanPlayAnimationFire())
+                return;
+
+            if (equippedWeapon.HasAmmunition())
+            {
+                if (Time.time - lastShotTime > 60.0f / equippedWeapon.GetRateOfFire())
+                {
+                    Fire();
+                    if (checking == null)
+                    {
+                        var checkingPrefab = Resources.Load("checking") as GameObject;
+                        if (checkingPrefab != null) Instantiate(checkingPrefab);
+                    }
+                }
+            }
+            else
+            {
+                FireEmpty();
+            }
+        }
+
+        /// <summary>
+        /// Bật/Tắt chế độ ngắm (Scope / ADS) cho Mobile.
+        /// </summary>
+        public void ToggleAim()
+        {
+            if (Time.timeScale == 0f) return;
+            holdingButtonAim = !holdingButtonAim;
+        }
+
+        /// <summary>
+        /// Thiết lập trạng thái ngắm cho Mobile.
+        /// </summary>
+        public void SetAim(bool aim)
+        {
+            if (Time.timeScale == 0f) return;
+            holdingButtonAim = aim;
+        }
+
+        /// <summary>
+        /// Nạp lại đạn cho Mobile (tương ứng phím R trên PC).
+        /// </summary>
+        public void TryReload()
+        {
+            if (Time.timeScale == 0f || equippedWeapon == null)
+                return;
+
+            if (!CanPlayAnimationReload())
+                return;
+
+            PlayReloadAnimation();
+        }
+
+        /// <summary>
+        /// Đổi sang súng tiếp theo cho Mobile.
+        /// </summary>
+        public void MobileNextWeapon()
+        {
+            if (Time.timeScale == 0f || inventory == null) return;
+            if (CanChangeWeapon())
+            {
+                int nextIndex = inventory.GetNextIndex();
+                if (nextIndex != inventory.GetEquippedIndex())
+                {
+                    StartCoroutine(nameof(Equip), nextIndex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Trang bị vũ khí theo chỉ số cụ thể cho Mobile (0: AR, 1: Handgun).
+        /// Nếu súng đó đang được chọn mà đang cất (holstered), sẽ rút súng ra.
+        /// </summary>
+        public void MobileEquipWeaponIndex(int index)
+        {
+            if (Time.timeScale == 0f || inventory == null) return;
+
+            int current = inventory.GetEquippedIndex();
+            if (current != index)
+            {
+                if (CanChangeWeapon())
+                {
+                    StartCoroutine(nameof(Equip), index);
+                }
+            }
+            else
+            {
+                // Nếu đang dùng súng này nhưng đang bị cất súng thì rút súng ra
+                if (holstered)
+                {
+                    MobileUnholster();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Bật/Tắt cất súng cho Mobile (tương ứng phím H trên PC).
+        /// </summary>
+        public void MobileToggleHolster()
+        {
+            if (Time.timeScale == 0f) return;
+
+            if (holstered)
+            {
+                MobileUnholster();
+            }
+            else
+            {
+                MobileHolster();
+            }
+        }
+
+        /// <summary>
+        /// Cất súng (Holster).
+        /// </summary>
+        public void MobileHolster()
+        {
+            if (Time.timeScale == 0f) return;
+            if (!holstered && CanPlayAnimationHolster())
+            {
+                SetHolstered(true);
+                holstering = true;
+            }
+        }
+
+        /// <summary>
+        /// Rút súng ra (Unholster).
+        /// </summary>
+        public void MobileUnholster()
+        {
+            if (Time.timeScale == 0f) return;
+            if (holstered)
+            {
+                SetHolstered(false);
+                holstering = true;
+                if (characterAnimator != null)
+                {
+                    characterAnimator.Play("Unholster", layerHolster, 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ngắm / Kiểm tra súng cho Mobile (tương ứng phím T trên PC).
+        /// </summary>
+        public void MobileInspect()
+        {
+            if (Time.timeScale == 0f) return;
+            if (CanPlayAnimationInspect())
+            {
+                Inspect();
+            }
+        }
+
+        /// <summary>
+        /// Kiểm tra súng có đang cất không.
+        /// </summary>
+        public bool IsHolstered() => holstered;
+
+        /// <summary>
+        /// Kiểm tra có đang kiểm tra/ngắm súng không.
+        /// </summary>
+        public bool IsInspecting() => inspecting;
+
+        /// <summary>
+        /// Lấy index vũ khí đang trang bị.
+        /// </summary>
+        public int GetEquippedWeaponIndex() => inventory != null ? inventory.GetEquippedIndex() : -1;
 
         #endregion
 

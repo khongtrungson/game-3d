@@ -36,10 +36,14 @@ public class player_health : MonoBehaviour
         }
     }
 
+    [Header("Combat Timers")]
+    public static float LastDamageTime { get; private set; } = -999f;
+
     public void TakeDamage(float amount)
     {
         if (health > 0)
         {
+            LastDamageTime = Time.time;
             health -= amount;
             
             if (audioSource != null && player_hurt != null)
@@ -84,22 +88,10 @@ public class player_health : MonoBehaviour
             hbs.sethealth(health);
         }
 
-        // 2. Xử lý nhặt Medikit (Chỉ quét tìm Medikit khi ấn phím CapsLock)
-        if (Input.GetKeyDown(KeyCode.CapsLock) && health < max_health)
+        // 2. Xử lý nhặt Medikit khi ấn phím CapsLock trên PC
+        if (Input.GetKeyDown(KeyCode.CapsLock))
         {
-            GameObject[] medikits = GameObject.FindGameObjectsWithTag("medikit");
-            foreach (var kit in medikits)
-            {
-                if (kit == null) continue;
-
-                float dis = Vector3.Distance(player.position, kit.transform.position);
-                if (dis < 2.5f)
-                {
-                    used_kit = kit;
-                    recharge_health = true;
-                    break;
-                }
-            }
+            UseMedkit();
         }
 
         // 3. Hồi máu
@@ -111,6 +103,31 @@ public class player_health : MonoBehaviour
                 Destroy(used_kit);
             }
             recharge_health = false;
+        }
+    }
+
+    /// <summary>
+    /// Sử dụng hộp cứu thương (Medkit) để hồi đầy máu.
+    /// Dành cho phím CapsLock trên PC hoặc nút Btn_Mekit trên Mobile.
+    /// </summary>
+    public void UseMedkit()
+    {
+        if (player_dead || health >= max_health)
+            return;
+
+        Transform playerTransform = player != null ? player : transform;
+        GameObject[] medikits = GameObject.FindGameObjectsWithTag("medikit");
+        foreach (var kit in medikits)
+        {
+            if (kit == null) continue;
+
+            float dis = Vector3.Distance(playerTransform.position, kit.transform.position);
+            if (dis < 2.5f)
+            {
+                used_kit = kit;
+                recharge_health = true;
+                break;
+            }
         }
     }
 }

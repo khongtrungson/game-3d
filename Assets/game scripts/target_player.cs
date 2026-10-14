@@ -32,14 +32,21 @@ public class target_player : MonoBehaviour
 
         checking = GameObject.FindGameObjectWithTag("checking");
 
-        if (Input.GetMouseButtonDown(0) && checking != null && health_player != null && health_player.health > 0) {
-            shoot();
+        // Nếu không có script Character trên cùng object thì mới tự bắt chuột ở đây
+        if (GetComponent<InfimaGames.LowPolyShooterPack.Character>() == null)
+        {
+            if (Input.GetMouseButtonDown(0) && checking != null && health_player != null && health_player.health > 0) {
+                shoot();
+            }
         }
     }
 
-    private void shoot() {
+    public void shoot() {
+        if (health_player != null && health_player.health <= 0) return;
+
+        Transform fireOrigin = gun != null ? gun.transform : transform;
         RaycastHit hit;
-        if (Physics.Raycast(gun.transform.position, gun.transform.forward, out hit, range)) {
+        if (Physics.Raycast(fireOrigin.position, fireOrigin.forward, out hit, range)) {
             
             // 1. Zombie Đất
             Enemy_health health_script = hit.transform.GetComponent<Enemy_health>();

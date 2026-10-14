@@ -31,6 +31,9 @@ public class DeathScreenUI : MonoBehaviour
         
         if (targetImage != null) targetImage.gameObject.SetActive(false);
         if (targetText != null) targetText.gameObject.SetActive(false);
+        if (replayCanvasGroup != null) replayCanvasGroup.gameObject.SetActive(false);
+        if (menuCanvasGroup != null) menuCanvasGroup.gameObject.SetActive(false);
+        if (quitCanvasGroup != null) quitCanvasGroup.gameObject.SetActive(false);
     }
 
     void Update()
@@ -66,11 +69,15 @@ public class DeathScreenUI : MonoBehaviour
 
         SetAlpha(targetImage, targetText, 1f);
 
-        // 3. Đợi thêm (8 giây - thời gian fade) để tổng thời gian từ lúc chết đúng bằng 8 giây
-        // Hoặc bạn có thể chờ đúng 8 giây từ lúc bắt đầu chết:
+        // 3. Đợi thêm để tổng thời gian từ lúc chết đúng khoảng thời gian mong muốn
         yield return new WaitForSecondsRealtime(4f);
 
-        // 4. Hiện dần 3 nút Replay, Menu, Quit lên (Fade In trong 0.5 giây)
+        // Kích hoạt lại các nút trước khi fade in
+        if (replayCanvasGroup != null) replayCanvasGroup.gameObject.SetActive(true);
+        if (menuCanvasGroup != null) menuCanvasGroup.gameObject.SetActive(true);
+        if (quitCanvasGroup != null) quitCanvasGroup.gameObject.SetActive(true);
+
+        // 4. Hiện dần 3 nút Replay, Menu, Quit lên (Fade In)
         float buttonFadeTime = 1f;
         elapsedTime = 0f;
 
@@ -84,8 +91,10 @@ public class DeathScreenUI : MonoBehaviour
 
         SetButtonsAlpha(1f);
 
-        // 5. Dừng hẳn thời gian game lại để người chơi bấm nút
+        // 5. Dừng hẳn thời gian game lại để người chơi bấm nút và mở chuột
         Time.timeScale = 0f;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     private void SetAlpha(Image img, Text txt, float alpha)
@@ -106,9 +115,25 @@ public class DeathScreenUI : MonoBehaviour
 
     private void SetButtonsAlpha(float alpha)
     {
-        if (replayCanvasGroup != null) replayCanvasGroup.alpha = alpha;
-        if (menuCanvasGroup != null) menuCanvasGroup.alpha = alpha;
-        if (quitCanvasGroup != null) quitCanvasGroup.alpha = alpha;
+        bool isClickable = alpha > 0.05f;
+        if (replayCanvasGroup != null)
+        {
+            replayCanvasGroup.alpha = alpha;
+            replayCanvasGroup.blocksRaycasts = isClickable;
+            replayCanvasGroup.interactable = isClickable;
+        }
+        if (menuCanvasGroup != null)
+        {
+            menuCanvasGroup.alpha = alpha;
+            menuCanvasGroup.blocksRaycasts = isClickable;
+            menuCanvasGroup.interactable = isClickable;
+        }
+        if (quitCanvasGroup != null)
+        {
+            quitCanvasGroup.alpha = alpha;
+            quitCanvasGroup.blocksRaycasts = isClickable;
+            quitCanvasGroup.interactable = isClickable;
+        }
     }
 
     // Các hàm xử lý nút bấm

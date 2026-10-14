@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using UnityEngine;
 
@@ -90,7 +90,22 @@ namespace InfimaGames.LowPolyShooterPack
         public override ScopeBehaviour GetEquippedScope() => scopeBehaviour;
         public override ScopeBehaviour GetEquippedScopeDefault() => scopeDefaultBehaviour;
 
-        public override MagazineBehaviour GetEquippedMagazine() => magazineBehaviour;
+        public override MagazineBehaviour GetEquippedMagazine()
+        {
+            if (magazineBehaviour == null)
+            {
+                if (magazineArray != null && magazineIndex >= 0 && magazineIndex < magazineArray.Length && magazineArray[magazineIndex] != null)
+                {
+                    magazineBehaviour = magazineArray[magazineIndex];
+                }
+                else
+                {
+                    magazineBehaviour = GetComponentInChildren<MagazineBehaviour>(true);
+                }
+            }
+            return magazineBehaviour;
+        }
+
         public override MuzzleBehaviour GetEquippedMuzzle() => muzzleBehaviour;
 
         #endregion

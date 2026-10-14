@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using UnityEngine;
 
@@ -146,19 +146,39 @@ namespace InfimaGames.LowPolyShooterPack
             //Cache the world camera. We use this in line traces.
             playerCamera = characterBehaviour.GetCameraWorld().transform;
         }
+
+        private void EnsureAttachmentReferences()
+        {
+            if (attachmentManager == null)
+                attachmentManager = GetComponent<WeaponAttachmentManagerBehaviour>();
+
+            if (magazineBehaviour == null)
+            {
+                if (attachmentManager != null)
+                    magazineBehaviour = attachmentManager.GetEquippedMagazine();
+                if (magazineBehaviour == null)
+                    magazineBehaviour = GetComponentInChildren<MagazineBehaviour>(true);
+
+                if (magazineBehaviour != null && ammunitionCurrent == 0)
+                    ammunitionCurrent = magazineBehaviour.GetAmmunitionTotal();
+            }
+
+            if (muzzleBehaviour == null)
+            {
+                if (attachmentManager != null)
+                    muzzleBehaviour = attachmentManager.GetEquippedMuzzle();
+                if (muzzleBehaviour == null)
+                    muzzleBehaviour = GetComponentInChildren<MuzzleBehaviour>(true);
+            }
+        }
+
         protected override void Start()
         {
-            #region Cache Attachment References
-            
-            //Get Magazine.
-            magazineBehaviour = attachmentManager.GetEquippedMagazine();
-            //Get Muzzle.
-            muzzleBehaviour = attachmentManager.GetEquippedMuzzle();
-
-            #endregion
+            EnsureAttachmentReferences();
 
             //Max Out Ammo.
-            ammunitionCurrent = magazineBehaviour.GetAmmunitionTotal();
+            if (magazineBehaviour != null)
+                ammunitionCurrent = magazineBehaviour.GetAmmunitionTotal();
         }
 
         #endregion
@@ -177,20 +197,41 @@ namespace InfimaGames.LowPolyShooterPack
 
         public override AudioClip GetAudioClipFireEmpty() => audioClipFireEmpty;
         
-        public override AudioClip GetAudioClipFire() => muzzleBehaviour.GetAudioClipFire();
+        public override AudioClip GetAudioClipFire()
+        {
+            EnsureAttachmentReferences();
+            return muzzleBehaviour != null ? muzzleBehaviour.GetAudioClipFire() : null;
+        }
         
-        public override int GetAmmunitionCurrent() => ammunitionCurrent;
+        public override int GetAmmunitionCurrent()
+        {
+            EnsureAttachmentReferences();
+            return ammunitionCurrent;
+        }
 
-        public override int GetAmmunitionTotal() => magazineBehaviour.GetAmmunitionTotal();
+        public override int GetAmmunitionTotal()
+        {
+            EnsureAttachmentReferences();
+            return magazineBehaviour != null ? magazineBehaviour.GetAmmunitionTotal() : 0;
+        }
 
         public override bool IsAutomatic() => automatic;
         public override float GetRateOfFire() => roundsPerMinutes;
         
-        public override bool IsFull() => ammunitionCurrent == magazineBehaviour.GetAmmunitionTotal();
+        public override bool IsFull()
+        {
+            EnsureAttachmentReferences();
+            return magazineBehaviour != null && ammunitionCurrent == magazineBehaviour.GetAmmunitionTotal();
+        }
+
         public override bool HasAmmunition() => ammunitionCurrent > 0;
 
         public override RuntimeAnimatorController GetAnimatorController() => controller;
-        public override WeaponAttachmentManagerBehaviour GetAttachmentManager() => attachmentManager;
+        public override WeaponAttachmentManagerBehaviour GetAttachmentManager()
+        {
+            EnsureAttachmentReferences();
+            return attachmentManager;
+        }
 
         #endregion
 

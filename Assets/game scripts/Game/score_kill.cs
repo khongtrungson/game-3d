@@ -168,11 +168,13 @@ public class score_kill : MonoBehaviour
         isGameEnded = true;
         Debug.Log("THẮNG GAME - Đã kích hoạt điều kiện Win!");
 
+        StartCoroutine(FadeInButtonsRoutine());
+
         float timeSpent = initial_timevalue - timevalue;
         float minutes = Mathf.FloorToInt(timeSpent / 60f);
         float seconds = Mathf.FloorToInt(timeSpent % 60f);
 
-        // Kiểm tra an toàn trước khi gán text
+        // Hiển thị thông tin Kills và Time lên bảng Win
         if (winKillsText != null)
         {
             winKillsText.text = "Kills: " + finalKills;
@@ -183,7 +185,7 @@ public class score_kill : MonoBehaviour
             winTimeText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
         }
 
-        // 1. Hiển thị bảng Win Canvas (Kiểm tra null để tránh lỗi)
+        // 1. Hiển thị bảng Win Canvas
         if (winCanvas != null)
         {
             winCanvas.SetActive(true);
@@ -193,7 +195,7 @@ public class score_kill : MonoBehaviour
             Debug.LogWarning("⚠️ Chưa kéo gán winCanvas vào script score_kill trong Inspector!");
         }
 
-        // 2. Ẩn toàn bộ các HUD trên màn hình (kiểm tra mảng và phần tử null)
+        // 2. Ẩn các HUD được cấu hình trong mảng hudElementsToHide
         if (hudElementsToHide != null)
         {
             foreach (GameObject hud in hudElementsToHide)
@@ -205,7 +207,24 @@ public class score_kill : MonoBehaviour
             }
         }
 
-        // 3. Khóa chuột để hiện con trỏ bấm nút
+        // Ẩn các thành phần Text HUD chính
+        if (kill != null) kill.gameObject.SetActive(false);
+        if (timer != null) timer.gameObject.SetActive(false);
+        if (grenade != null) grenade.gameObject.SetActive(false);
+
+        // Tùy chọn: Tự động ẩn tất cả các đối tượng UI khác (nếu nằm chung Canvas gameplay) ngoại trừ WinCanvas
+        // Giúp giải quyết triệt để vấn đề sót lại các nút bấm di chuyển/bắn súng trên mobile
+        foreach (Transform child in transform.root)
+        {
+            // Nếu đối tượng là Canvas gameplay (không phải WinCanvas) thì tắt đi
+            Canvas c = child.GetComponent<Canvas>();
+            if (c != null && child.gameObject != winCanvas)
+            {
+                child.gameObject.SetActive(false);
+            }
+        }
+
+        // 3. Khóa/Mở khóa chuột để hiện con trỏ bấm nút
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -213,8 +232,8 @@ public class score_kill : MonoBehaviour
         Time.timeScale = 0f;
 
         // 5. Chạy hiệu ứng hiện nút bấm
-        StartCoroutine(FadeInButtonsRoutine());
-}
+        
+    }
 
     IEnumerator FadeInButtonsRoutine()
     {

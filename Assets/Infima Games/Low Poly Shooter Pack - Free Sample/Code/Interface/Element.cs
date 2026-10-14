@@ -1,4 +1,4 @@
-﻿// Copyright 2021, Infima Games. All Rights Reserved.
+// Copyright 2021, Infima Games. All Rights Reserved.
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -32,6 +32,15 @@ namespace InfimaGames.LowPolyShooterPack.Interface
         protected WeaponBehaviour equippedWeapon;
         // private pause_menu_script pms;
         
+        [Header("Weapon Binding")]
+        [Tooltip("Weapon index to track. -1 to track currently equipped weapon, 0 for AR, 1 for Handgun.")]
+        [SerializeField]
+        protected int targetWeaponIndex = -1;
+
+        [Tooltip("If true, auto-detect target weapon index from hierarchy names (e.g. 'Handgun' -> 1, 'AR'/'Ammo' -> 0).")]
+        [SerializeField]
+        protected bool autoDetectWeaponIndex = true;
+        
         #endregion
 
         #region UNITY
@@ -47,7 +56,33 @@ namespace InfimaGames.LowPolyShooterPack.Interface
             //Get Player Character.
             playerCharacter = gameModeService.GetPlayerCharacter();
             //Get Player Character Inventory.
-            playerCharacterInventory = playerCharacter.GetInventory();
+            playerCharacterInventory = playerCharacter != null ? playerCharacter.GetInventory() : null;
+        }
+
+        /// <summary>
+        /// Start. Auto-detect weapon binding based on parent hierarchy.
+        /// </summary>
+        protected virtual void Start()
+        {
+            if (autoDetectWeaponIndex && targetWeaponIndex == -1)
+            {
+                Transform curr = transform;
+                while (curr != null)
+                {
+                    string n = curr.name.ToLowerInvariant();
+                    if (n.Contains("handgun") || n.Contains("pistol"))
+                    {
+                        targetWeaponIndex = 1;
+                        break;
+                    }
+                    else if (n.Contains("ar") || n.Contains("rifle") || n == "ammo")
+                    {
+                        targetWeaponIndex = 0;
+                        break;
+                    }
+                    curr = curr.parent;
+                }
+            }
         }
         
         /// <summary>
@@ -55,21 +90,39 @@ namespace InfimaGames.LowPolyShooterPack.Interface
         /// </summary>
         private void Update()
         {
-            //Ignore if we don't have an Inventory.
+            //Ensure we have Inventory reference.
             if (Equals(playerCharacterInventory, null))
-                return;
+            {
+                if (playerCharacter != null)
+                    playerCharacterInventory = playerCharacter.GetInventory();
+                else if (gameModeService != null)
+                {
+                    playerCharacter = gameModeService.GetPlayerCharacter();
+                    if (playerCharacter != null)
+                        playerCharacterInventory = playerCharacter.GetInventory();
+                }
 
-            //Get Equipped Weapon.
-            equippedWeapon = playerCharacterInventory.GetEquipped();
+                if (Equals(playerCharacterInventory, null))
+                    return;
+            }
+
+            //Get Target or Equipped Weapon.
+            if (targetWeaponIndex >= 0)
+            {
+                equippedWeapon = playerCharacterInventory.GetWeapon(targetWeaponIndex);
+                if (equippedWeapon == null)
+                    equippedWeapon = playerCharacterInventory.GetEquipped();
+            }
+            else
+            {
+                equippedWeapon = playerCharacterInventory.GetEquipped();
+            }
+
+            if (equippedWeapon == null)
+                return;
             
             //Tick.
             Tick();
-            // if(pms.gamepaused){
-            //       if(Input.GetKeyDown(KeyCode.Backspace)){
-            //          Time.timeScale=1f;
-            //         SceneManager.LoadScene("game");
-            //     }
-            // }
         }
 
         #endregion

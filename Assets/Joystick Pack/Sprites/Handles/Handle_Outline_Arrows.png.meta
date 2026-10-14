@@ -1,10 +1,17 @@
 fileFormatVersion: 2
-guid: 5de2ff934a8b3ea4ebfe923a6f958686
+guid: 5eda94a9dcf71e445ad17e3c065d1460
+AssetOrigin:
+  serializedVersion: 1
+  productId: 107631
+  packageName: Joystick Pack
+  packageVersion: 2.1
+  assetPath: Assets/Joystick Pack/Sprites/Handles/Handle_Outline_Arrows.png
+  uploadId: 301683
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 876290756027133943
-    second: T_HUD_Handgun_03_D_0
+      213: 7204804395708042649
+    second: Handle_Outline_Arrows_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -84,9 +91,22 @@ TextureImporter:
     overridden: 0
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
   - serializedVersion: 4
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 4
+    buildTarget: iOS
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -110,18 +130,31 @@ TextureImporter:
     overridden: 0
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: T_HUD_Handgun_03_D_0
+      name: Handle_Outline_Arrows_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1024
-        height: 358
+        width: 257
+        height: 256
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,8 +163,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7ffa4f0ccc5392c00800000000000000
-      internalID: 876290756027133943
+      spriteID: 99dc95adc6b9cf360800000000000000
+      internalID: 7204804395708042649
       vertices: []
       indices: 
       edges: []
