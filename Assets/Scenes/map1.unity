@@ -9627,7 +9627,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 125308237}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnJumpClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &125308237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29730,7 +29742,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 455066281}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnReloadClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &455066281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34292,7 +34316,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 516934113}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnMekitClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &516934113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34535,7 +34571,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 528429848}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnShootClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &528429848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37871,7 +37919,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 580760233}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnScopeHold
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &580760233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38507,7 +38567,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 586156539}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnHandgunClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &586156539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60691,7 +60763,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -285, y: -420}
+  m_AnchoredPosition: {x: -365.75, y: -498}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &926266658
@@ -103880,7 +103952,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1638528583}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnBombClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1638528583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108906,7 +108990,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1700079597}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 925957929}
+        m_TargetAssemblyTypeName: MobileInputController, Assembly-CSharp
+        m_MethodName: OnARClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1700079597
 MonoBehaviour:
   m_ObjectHideFlags: 0

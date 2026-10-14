@@ -43,8 +43,8 @@ public class SettingManager : MonoBehaviour
         sensitivitySlider.maxValue = 5f;
 
         timeBetweenWaves = 15f;
-        zombiePerWave = 5;
-        maxWaves = 7;
+        zombiePerWave = 2;
+        maxWaves = 1;
         smoothSpeed = 10f;
         sensitivity = 2f;
 
@@ -148,8 +148,8 @@ public class SettingManager : MonoBehaviour
     private void SetNormalDifficulty()
     {
         timeBetweenWaves = 15f;
-        zombiePerWave = 5;
-        maxWaves = 7;
+        zombiePerWave = 2;
+        maxWaves = 1;
     }
 
     private void SetHardDifficulty()
